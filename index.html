@@ -327,6 +327,56 @@ a.btn{text-decoration:none}
 
 <script>
 'use strict';
+
+/* =====================================================================
+   Thousand Labs — section « Installer l'application » (commune à toutes les applis)
+   TLI.html(nom, classeBouton) → bloc à insérer dans les réglages.
+   • Bouton « Installer » quand le navigateur propose l'installation complète
+     (appli sans logo de navigateur sur l'icône).
+   • Sinon : explications pas à pas Android / iPhone / ordinateur.
+   ===================================================================== */
+var TLI=(function(){
+  var evt=null,T=function(s){return (TLI&&TLI.t)?TLI.t(s):s};
+  try{addEventListener('beforeinstallprompt',function(e){e.preventDefault();evt=e;upd()});
+      addEventListener('appinstalled',function(){evt=null;upd()})}catch(e){}
+  function sa(){try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}}
+  function ios(){var u=navigator.userAgent||'';return /iphone|ipad|ipod/i.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
+  function inner(name,btn){
+    var st='',S='style="margin:6px 0 0;font-size:13.5px;line-height:1.5;opacity:.85"';
+    if(evt)st='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.5">'+T('Ton navigateur peut installer {app} comme une vraie application : icône propre (sans logo de navigateur), plein écran et ouverture hors ligne.').replace('{app}','<b>'+name+'</b>')+'</p>'
+      +'<button type="button" class="'+btn+'" style="width:100%" onclick="TLI.go()">📲 '+T('Installer {app}').replace('{app}',name)+'</button>'
+      +'<p '+S+'>'+T('Tu as déjà une icône avec le petit logo du navigateur ? Après l\'installation, fais une sauvegarde de tes données, puis supprime l\'ancienne icône.')+'</p>';
+    else if(sa())st='<p style="margin:0;font-size:14.5px;line-height:1.5">✅ '+T('{app} est ouverte comme une application.').replace('{app}','<b>'+name+'</b>')+'</p>'
+      +'<p '+S+'>'+T('Si son icône porte le petit logo de ton navigateur, c\'est un simple raccourci. Pour une installation complète, suis les étapes ci-dessous.')+'</p>';
+    else st='<p style="margin:0;font-size:14.5px;line-height:1.5">'+T('Installe {app} sur ton écran d\'accueil : elle s\'ouvrira comme une vraie application, même sans Internet.').replace('{app}','<b>'+name+'</b>')+'</p>';
+    var A='<p style="margin:10px 0 4px"><b>📱 Android (Chrome, Brave, Samsung Internet)</b></p><ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.55"><li>'+T('Ouvre le lien de l\'appli dans le navigateur, avec Internet.')+'</li><li>'+T('Touche le menu <b>⋮</b> (en haut ou en bas à droite).')+'</li><li>'+T('Choisis <b>« Installer l\'application »</b>. Évite « Ajouter à l\'écran d\'accueil » : ça crée un simple raccourci avec le logo du navigateur.')+'</li><li>'+T('Si « Installer » n\'apparaît pas : recharge la page, attends quelques secondes et réessaie.')+'</li></ol>';
+    var I='<p style="margin:10px 0 4px"><b>🍏 iPhone / iPad (Safari)</b></p><ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.55"><li>'+T('Ouvre le lien dans <b>Safari</b>.')+'</li><li>'+T('Touche <b>Partager</b> (le carré avec une flèche).')+'</li><li>'+T('Choisis <b>« Sur l\'écran d\'accueil »</b>, puis <b>Ajouter</b>.')+'</li></ol><p '+S+'>⚠️ '+T('Sur iPhone, installe l\'appli AVANT de l\'activer, puis ouvre-la toujours depuis son icône : l\'iPhone sépare Safari et les applis installées.')+'</p>';
+    var C='<p style="margin:10px 0 4px"><b>💻 '+T('Ordinateur (Chrome, Edge, Brave)')+'</b></p><p style="margin:0;font-size:14px">'+T('Clique sur l\'icône d\'installation à droite de la barre d\'adresse.')+'</p>';
+    var steps=ios()?I+A+C:A+I+C;
+    return st+'<details style="margin-top:10px"'+(evt||sa()?'':' open')+'><summary style="cursor:pointer;font-weight:600;font-size:14px">'+T('Comment installer, pas à pas')+'</summary>'+steps+'</details>';
+  }
+  var last={};
+  function upd(){try{document.querySelectorAll('[data-tli]').forEach(function(el){el.innerHTML=inner(el.getAttribute('data-tli'),el.getAttribute('data-tlib')||'')})}catch(e){}}
+  return {
+    html:function(name,btn){return '<div data-tli="'+name+'" data-tlib="'+(btn||'')+'">'+inner(name,btn||'')+'</div>'},
+    go:function(){if(!evt)return;var e=evt;e.prompt();(e.userChoice||Promise.resolve()).then(function(){evt=null;upd()},function(){evt=null;upd()})},
+    can:function(){return !!evt},standalone:sa,upd:upd,t:null
+  };
+})();
+TLI.t=function(s){var V={
+"Ton navigateur peut installer {app} comme une vraie application : icône propre (sans logo de navigateur), plein écran et ouverture hors ligne.":"Votre navigateur peut installer {app} comme une vraie application : icône propre (sans logo de navigateur), plein écran et ouverture hors ligne.",
+"Tu as déjà une icône avec le petit logo du navigateur ? Après l'installation, fais une sauvegarde de tes données, puis supprime l'ancienne icône.":"Vous avez déjà une icône avec le petit logo du navigateur ? Après l'installation, faites une sauvegarde de vos données, puis supprimez l'ancienne icône.",
+"Si son icône porte le petit logo de ton navigateur, c'est un simple raccourci. Pour une installation complète, suis les étapes ci-dessous.":"Si son icône porte le petit logo de votre navigateur, c'est un simple raccourci. Pour une installation complète, suivez les étapes ci-dessous.",
+"Installe {app} sur ton écran d'accueil : elle s'ouvrira comme une vraie application, même sans Internet.":"Installez {app} sur votre écran d'accueil : elle s'ouvrira comme une vraie application, même sans Internet.",
+"Ouvre le lien de l'appli dans le navigateur, avec Internet.":"Ouvrez le lien de l'appli dans le navigateur, avec Internet.",
+"Touche le menu <b>⋮</b> (en haut ou en bas à droite).":"Touchez le menu <b>⋮</b> (en haut ou en bas à droite).",
+"Choisis <b>« Installer l'application »</b>. Évite « Ajouter à l'écran d'accueil » : ça crée un simple raccourci avec le logo du navigateur.":"Choisissez <b>« Installer l'application »</b>. Évitez « Ajouter à l'écran d'accueil » : cela crée un simple raccourci avec le logo du navigateur.",
+"Si « Installer » n'apparaît pas : recharge la page, attends quelques secondes et réessaie.":"Si « Installer » n'apparaît pas : rechargez la page, attendez quelques secondes et réessayez.",
+"Ouvre le lien dans <b>Safari</b>.":"Ouvrez le lien dans <b>Safari</b>.",
+"Touche <b>Partager</b> (le carré avec une flèche).":"Touchez <b>Partager</b> (le carré avec une flèche).",
+"Choisis <b>« Sur l'écran d'accueil »</b>, puis <b>Ajouter</b>.":"Choisissez <b>« Sur l'écran d'accueil »</b>, puis <b>Ajouter</b>.",
+"Sur iPhone, installe l'appli AVANT de l'activer, puis ouvre-la toujours depuis son icône : l'iPhone sépare Safari et les applis installées.":"Sur iPhone, installez l'appli AVANT de l'activer, puis ouvrez-la toujours depuis son icône : l'iPhone sépare Safari et les applis installées.",
+"Clique sur l'icône d'installation à droite de la barre d'adresse.":"Cliquez sur l'icône d'installation à droite de la barre d'adresse."};return V[s]||s};
 /* =========================================================================
    1. UTILITAIRES
    ========================================================================= */
@@ -1387,9 +1437,9 @@ views.reglages = () => {
       <p class="hint mt-s">« Tout effacer » conserve votre activation.</p>
     </div>
     <div class="card">
-      <h2>Application</h2>
-      <p class="sub mt-s">${isStandalone() ? '✓ Budget Flow est installé et fonctionne hors ligne.' : 'Installez Budget Flow sur votre écran d’accueil pour l’ouvrir comme une vraie application, même sans Internet.'}</p>
-      <div class="mt">${isStandalone() ? '' : installBtn('btn btn-primary')}</div>
+      <h2>📲 Installer l'application</h2>
+      <div class="mt-s">${TLI.html('Budget Flow', 'btn btn-primary')}</div>
+      <p class="hint mt">Site officiel : <a href="https://thousandlabs.github.io/Budget-Flow/" target="_blank" rel="noopener" style="color:var(--primary)">thousandlabs.github.io/Budget-Flow</a></p>
     </div>
     <div class="card">
       <h2>Licence</h2>
