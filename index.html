@@ -291,6 +291,17 @@ a.btn{text-decoration:none}
 .scanbox video{width:100%;height:100%;object-fit:cover;display:block}
 .scanbox i{position:absolute;inset:14%;border:3px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}
 .code-area{min-height:84px;font:12px/1.4 ui-monospace,Menlo,monospace;word-break:break-all;resize:vertical}
+/* Choix du mode simple / complet */
+body.choosing .sidebar,body.choosing .bottomnav{display:none}
+.mode-wrap{max-width:760px;margin:0 auto;padding:8px 0 40px}
+.mode-wrap h1{font-size:24px;line-height:1.25;margin-top:6px}
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.mode-card{display:block;width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer;border:2px solid var(--border);transition:border-color .15s,transform .1s}
+.mode-card:active{transform:scale(.99)}
+.mode-card.on{border-color:var(--primary)}
+.mode-card h2{font-size:17px}
+.mode-list{margin:10px 0 0;padding-left:18px;font-size:14px;line-height:1.5}
+.mode-list li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -494,6 +505,47 @@ var TLL=(function(){
 
 /* Dictionnaire français → anglais */
 var TLL_EN={
+"Sauvegarde annulée.": "Backup cancelled.",
+"Sauvegarde envoyée ✓": "Backup sent ✓",
+"Sauvegarde téléchargée. Gardez le fichier en lieu sûr (WhatsApp, Drive…).": "Backup downloaded. Keep the file somewhere safe (WhatsApp, Drive…).",
+"Votre dernière sauvegarde date de plus de 7 jours.": "Your last backup is more than 7 days old.",
+"Vous n'avez encore fait aucune sauvegarde.": "You haven't made any backup yet.",
+"Si vous changez de téléphone ou videz le navigateur, vos données seront perdues.": "If you change phone or clear your browser, your data will be lost.",
+"Sauvegarder maintenant": "Back up now",
+"Comment voulez-vous utiliser Budget Flow ?": "How do you want to use Budget Flow?",
+"Choisissez la version qui vous convient. Vous pourrez changer à tout moment dans les": "Choose the version that suits you. You can switch at any time in",
+", sans perdre aucune donnée.": ", without losing any data.",
+"Mode simple": "Simple mode",
+"Mode complet": "Full mode",
+"Recommandé": "Recommended",
+"✓ Actuel": "✓ Current",
+"L'essentiel pour savoir où va votre argent, sans rien de compliqué.": "The essentials to see where your money goes, nothing complicated.",
+"Tableau de bord : votre solde et vos dépenses du mois": "Dashboard: your balance and this month's spending",
+"Journal de toutes vos dépenses": "Log of all your expenses",
+"Entrées : revenus, bourse, petits projets": "Income: earnings, grants, side projects",
+"Sorties : budgets par catégorie (loyer, Woyofal, nourriture…)": "Spending: budgets by category (rent, Woyofal, food…)",
+"Objectifs d'épargne": "Savings goals",
+"Idéal pour débuter ou si vous voulez aller vite.": "Ideal for getting started or if you want to go fast.",
+"Tout le mode simple, plus des outils pour anticiper et décider.": "Everything in simple mode, plus tools to plan ahead and decide.",
+"Mode survie : combien de jours vous pouvez tenir avec votre solde": "Survival mode: how many days your balance will last",
+"Projections et plafonds de dépenses par jour, semaine et mois": "Projections and spending limits per day, week and month",
+"Simulateur : tester un achat avant de le faire": "Simulator: test a purchase before making it",
+"Caisse de secours pour les imprévus": "Emergency fund for the unexpected",
+"Bilan détaillé du mois avec conseils": "Detailed monthly report with advice",
+"Pour ceux qui veulent piloter leur budget en détail.": "For those who want to manage their budget in detail.",
+"Mode d'affichage": "Display mode",
+"Touchez un mode pour l'activer. Vos données sont conservées dans les deux cas.": "Tap a mode to switch to it. Your data is kept either way.",
+"Mode simple activé. Bienvenue !": "Simple mode on. Welcome!",
+"Mode complet activé. Bienvenue !": "Full mode on. Welcome!",
+"Mode simple activé.": "Simple mode on.",
+"Mode complet activé.": "Full mode on.",
+"🧭 Mode simple ou mode complet": "🧭 Simple or full mode",
+"Au premier lancement, Budget Flow vous demande comment vous voulez l'utiliser :": "On first launch, Budget Flow asks how you want to use it:",
+": tableau de bord, journal, entrées, sorties et objectifs. L'essentiel pour savoir où va votre argent.": ": dashboard, log, income, spending and goals. The essentials to see where your money goes.",
+": tout le mode simple, plus le mode survie, les projections et plafonds, le simulateur d'achat, la caisse de secours et le bilan détaillé du mois.": ": everything in simple mode, plus survival mode, projections and limits, the purchase simulator, the emergency fund and the detailed monthly report.",
+"Vous pouvez changer à tout moment dans": "You can switch at any time in",
+"Réglages → Mode d'affichage": "Settings → Display mode",
+". Rien n'est effacé quand vous changez de mode.": ". Nothing is deleted when you switch mode.",
 "Ton navigateur peut installer {} comme une vraie application : icône propre (sans logo de navigateur), plein écran et ouverture hors ligne.": "Your browser can install {} as a real app: its own icon (no browser logo), full screen and offline access.",
 "Tu as déjà une icône avec le petit logo du navigateur ? Après l'installation, fais une sauvegarde de tes données, puis supprime l'ancienne icône.": "Already have an icon with the small browser logo? After installing, back up your data, then delete the old icon.",
 "Tu as déjà une icône avec le petit logo du navigateur ? Après l’installation, fais une sauvegarde de tes données, puis supprime l’ancienne icône.": "Already have an icon with the small browser logo? After installing, back up your data, then delete the old icon.",
@@ -1656,6 +1708,16 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
+// Sauvegarde : ouvre le menu de partage du téléphone (WhatsApp, Drive, e-mail…) ; sinon téléchargement classique.
+async function shareOrDownload(name, text) {
+  try {
+    const f = new File([text], name, {type: 'application/json'});
+    if (navigator.canShare && navigator.canShare({files: [f]})) { await navigator.share({files: [f], title: name}); return 'shared'; }
+  } catch (e) { if (e && e.name === 'AbortError') return 'cancel'; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type: 'application/json'})); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  return 'downloaded';
+}
 function copyText(t) {
   const done = () => toast('Copié : ' + t);
   if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(done, () => fallback());
@@ -1765,6 +1827,11 @@ const VIEWS = [
   {id: 'guide', label: 'Guide d’utilisation', icon: 'book'},
   {id: 'reglages', label: 'Réglages', icon: 'settings'}
 ];
+// Mode d'affichage : « simple » (l'essentiel) ou « complet » (tous les outils)
+const ADV_VIEWS = ['proj', 'sim', 'secours', 'bilan'];
+const isSimple = () => D.settings.mode === 'simple';
+const navViews = () => VIEWS.filter(v => !isSimple() || !ADV_VIEWS.includes(v.id));
+const usesAdvanced = () => !!(D.scenarios.length || D.habits.length || D.emergency.length || D.settings.caps.day || D.settings.caps.week || D.settings.caps.month);
 const state = {view: 'dash', journalMonth: curMonth(), bilanMonth: curMonth(), jq: '', jcat: '', lastCat: null};
 
 const field = (label, input, hint = '') => `<label class="field"><span class="label">${label}</span>${input}${hint ? `<span class="hint">${hint}</span>` : ''}</label>`;
@@ -1809,17 +1876,17 @@ views.dash = () => {
     <div class="card hero">
       <div class="k">Solde disponible</div>
       <div class="big mt ${t.balance < 0 ? 'neg' : ''}">${fmt(t.balance)}</div>
-      <div class="hero-row"><span>🛡️ Secours : <b>${fmt(t.em)}</b></span><span>🎯 Objectifs : <b>${fmt(t.gl)}</b></span></div>
+      <div class="hero-row">${!isSimple() || t.em ? `<span>🛡️ Secours : <b>${fmt(t.em)}</b></span>` : ''}<span>🎯 Objectifs : <b>${fmt(t.gl)}</b></span></div>
       <div class="hero-foot">Patrimoine total : <b>${fmt(t.balance + t.em + t.gl)}</b></div>
     </div>
-    ${survivalCard(sv)}
+    ${isSimple() ? '' : survivalCard(sv)}
   </div>
   ${alerts.length ? `<div class="stack mt2">${alerts.map(([c, m]) => `<div class="alert alert-${c}">${icon('shield', 18)}<span>${m}</span></div>`).join('')}</div>` : ''}
   <div class="grid g4 mt2">
     ${stat('Entrées du mois', fmt(ms.inTotal), ms.sales ? `dont projets ${fmt(ms.sales)}` : capFirst(MONTHS[parseD(today()).getMonth()]), 'pos')}
     ${stat('Dépenses du mois', fmt(ms.exp), caps.month ? 'variables : ' + capSub(ms.variable, caps.month) : `${ms.count} opération(s)`)}
-    ${stat("Variables aujourd'hui", fmt(sT), capSub(sT, caps.day), caps.day && sT > caps.day ? 'neg' : '')}
-    ${stat('Variables semaine', fmt(sW), capSub(sW, caps.week), caps.week && sW > caps.week ? 'neg' : '')}
+    ${isSimple() ? '' : stat("Variables aujourd'hui", fmt(sT), capSub(sT, caps.day), caps.day && sT > caps.day ? 'neg' : '')}
+    ${isSimple() ? '' : stat('Variables semaine', fmt(sW), capSub(sW, caps.week), caps.week && sW > caps.week ? 'neg' : '')}
   </div>
   <div class="grid g2 mt2">
     <div class="card">
@@ -1871,10 +1938,10 @@ function getAlerts() {
   }
   D.categories.filter(c => c.budget > 0 && (ms.byCat[c.id] || 0) > c.budget)
     .forEach(c => a.push(['amber', `${c.icon} ${esc(c.name)} : enveloppe dépassée de ${fmt(ms.byCat[c.id] - c.budget)}.`]));
-  const lb = D.settings.lastBackup;
-  if (D.expenses.length >= 15 && (!lb || diffDays(lb, today()) > 30))
-    a.push(['blue', `Pensez à exporter une sauvegarde de vos données. <button data-action="go" data-id="reglages">Sauvegarder</button>`]);
-  return a.slice(0, 6);
+  const lb = D.settings.lastBackup, nData = D.expenses.length + D.incomes.length + D.sales.length + D.goals.length;
+  const backupAlert = nData >= 3 && (!lb || diffDays(lb, today()) >= 7)
+    ? ['amber', `<span>${lb ? 'Votre dernière sauvegarde date de plus de 7 jours.' : "Vous n'avez encore fait aucune sauvegarde."} Si vous changez de téléphone ou videz le navigateur, vos données seront perdues.</span> <button class="btn btn-sm btn-primary mt-s" data-action="export" style="text-decoration:none">Sauvegarder maintenant</button>`] : null;
+  return backupAlert ? [backupAlert, ...a.slice(0, 5)] : a.slice(0, 6);
 }
 
 function expenseItem(e) {
@@ -2346,6 +2413,10 @@ function advice(ms, prev, rate, mk) {
 /* ---------- GUIDE D'UTILISATION ---------- */
 const GUIDE = [
   ['📲 Installer l\'application', `<p>Budget Flow s'installe sur l'écran d'accueil comme une application classique, avec son icône, et fonctionne ensuite <b>sans Internet</b>.</p>${INSTALL_HELP}`],
+  ['🧭 Mode simple ou mode complet', `<p>Au premier lancement, Budget Flow vous demande comment vous voulez l'utiliser :</p>
+    <ul><li><b>Mode simple</b> : tableau de bord, journal, entrées, sorties et objectifs. L'essentiel pour savoir où va votre argent.</li>
+    <li><b>Mode complet</b> : tout le mode simple, plus le mode survie, les projections et plafonds, le simulateur d'achat, la caisse de secours et le bilan détaillé du mois.</li></ul>
+    <p>Vous pouvez changer à tout moment dans <b>Réglages → Mode d'affichage</b>. Rien n'est effacé quand vous changez de mode.</p>`],
   ['🚀 Premiers pas (5 minutes)', `<ol>
     <li><b>Solde de départ</b> : dans Réglages, indiquez l'argent dont vous disposez aujourd'hui (espèces + mobile money + banque), hors épargne.</li>
     <li><b>Budgets</b> : dans Sorties, touchez ✎ sur chaque catégorie (loyer, Woyofal, nourriture…) et fixez un montant mensuel.</li>
@@ -2411,6 +2482,11 @@ views.reglages = () => {
     <div class="card">
       <h2>Langue</h2>
       ${TLL.switcher(true)}
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <h2>Mode d'affichage</h2>
+      <p class="sub mt-s">Touchez un mode pour l'activer. Vos données sont conservées dans les deux cas.</p>
+      <div class="mt">${modeChooser(true)}</div>
     </div>
     <div class="card">
       <h2>Taux de change</h2><p class="sub mt-s">1 unité de devise = X F CFA. Mis à jour automatiquement quand vous enregistrez un revenu.</p>
@@ -2648,7 +2724,7 @@ const forms = {
 const findIn = (arr, id) => arr.find(x => x.id === id);
 const actions = {
   go: id => go(id),
-  more: () => openModal('Toutes les sections', `<div class="more-grid">${VIEWS.map(v => `<button class="nav-btn ${state.view === v.id ? 'active' : ''}" data-action="go" data-id="${v.id}">${icon(v.icon, 22)}<span>${v.label}</span></button>`).join('')}</div>`),
+  more: () => openModal('Toutes les sections', `<div class="more-grid">${navViews().map(v => `<button class="nav-btn ${state.view === v.id ? 'active' : ''}" data-action="go" data-id="${v.id}">${icon(v.icon, 22)}<span>${v.label}</span></button>`).join('')}</div>`),
   'close-modal': closeModal,
   'lock-copy': () => copyText(getLic().dev),
   'lock-qr': () => { const d = getLic().dev; openModal('Votre code appareil', `<p class="sub" style="text-align:center">Le vendeur scanne ce QR code avec Thousand Admin.</p><div id="qrBox"></div><div class="dev-id" style="text-align:center">${d}</div>`); $('#qrBox').appendChild(QR.canvas('BFID:' + d, 600, 'M')); },
@@ -2669,6 +2745,11 @@ const actions = {
   'theme-toggle': () => { D.settings.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; save(); applyTheme(); if (state.view === 'reglages') render(); },
   'set-initial': () => openModal('Solde de départ', `<form data-form="initial" class="stack"><p class="sub">Combien d'argent avez-vous aujourd'hui (espèces + mobile money + banque), hors épargne ?</p>${field('Montant (F)', amountInput('initialBalance', D.settings.initialBalance || '', 'class="input input-xl" placeholder="0"').replace('class="input" ', ''))}<button class="btn btn-primary btn-block">Enregistrer</button></form>`),
   print: () => window.print(),
+  'set-mode': id => {
+    const first = !D.settings.mode; D.settings.mode = id === 'complet' ? 'complet' : 'simple'; save(); buildNav();
+    if (isSimple() && ADV_VIEWS.includes(state.view)) state.view = 'dash';
+    render(); toast(first ? (isSimple() ? 'Mode simple activé. Bienvenue !' : 'Mode complet activé. Bienvenue !') : (isSimple() ? 'Mode simple activé.' : 'Mode complet activé.'));
+  },
 
   // Dépenses
   'quick-expense': () => openModal('Nouvelle dépense', expenseForm({})),
@@ -2744,12 +2825,11 @@ const actions = {
   'bm-next': () => { state.bilanMonth = shiftMonth(state.bilanMonth, 1); render(); },
 
   // Sauvegarde
-  export: () => {
-    D.settings.lastBackup = today(); save();
-    const blob = new Blob([JSON.stringify(D, null, 2)], {type: 'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `budget-flow-sauvegarde-${today()}.json`;
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    render(); toast('Sauvegarde exportée.');
+  export: async () => {
+    const r = await shareOrDownload(`budget-flow-sauvegarde-${today()}.json`, JSON.stringify(D, null, 2));
+    if (r === 'cancel') return toast('Sauvegarde annulée.', 'warn');
+    D.settings.lastBackup = today(); save(); render();
+    toast(r === 'shared' ? 'Sauvegarde envoyée ✓' : 'Sauvegarde téléchargée. Gardez le fichier en lieu sûr (WhatsApp, Drive…).');
   },
   reset: () => {
     if (!confirm('Effacer TOUTES les données de Budget Flow ? Cette action est irréversible.')) return;
@@ -2788,8 +2868,33 @@ const live = {
 /* =========================================================================
    8. RENDU, NAVIGATION & ÉVÉNEMENTS
    ========================================================================= */
+function modeChooser(inSettings = false) {
+  const rec = usesAdvanced() ? 'complet' : 'simple', cur = D.settings.mode;
+  const card = (id, title, emoji, desc, items, who) => `
+    <button class="card mode-card ${cur === id ? 'on' : ''}" data-action="set-mode" data-id="${id}">
+      <div class="flex between"><h2>${emoji} ${title}</h2>${!inSettings && rec === id ? '<span class="badge b-green">Recommandé</span>' : cur === id ? '<span class="badge b-green">✓ Actuel</span>' : ''}</div>
+      <p class="sub mt-s">${desc}</p>
+      <ul class="mode-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>
+      <p class="hint mt-s">${who}</p>
+    </button>`;
+  const simple = card('simple', 'Mode simple', '🌱', "L'essentiel pour savoir où va votre argent, sans rien de compliqué.",
+    ['Tableau de bord : votre solde et vos dépenses du mois', 'Journal de toutes vos dépenses', 'Entrées : revenus, bourse, petits projets', 'Sorties : budgets par catégorie (loyer, Woyofal, nourriture…)', "Objectifs d'épargne"],
+    'Idéal pour débuter ou si vous voulez aller vite.');
+  const full = card('complet', 'Mode complet', '🚀', 'Tout le mode simple, plus des outils pour anticiper et décider.',
+    ['Mode survie : combien de jours vous pouvez tenir avec votre solde', 'Projections et plafonds de dépenses par jour, semaine et mois', 'Simulateur : tester un achat avant de le faire', 'Caisse de secours pour les imprévus', 'Bilan détaillé du mois avec conseils'],
+    'Pour ceux qui veulent piloter leur budget en détail.');
+  return inSettings ? `<div class="mode-grid">${simple}${full}</div>` : `
+  <div class="mode-wrap">
+    <div class="brand" style="padding:0 0 6px"><div class="brand-logo">${icon('flow', 20)}</div>Budget Flow</div>
+    <h1>Comment voulez-vous utiliser Budget Flow ?</h1>
+    <p class="sub mt-s">Choisissez la version qui vous convient. Vous pourrez changer à tout moment dans les <b>Réglages</b>, sans perdre aucune donnée.</p>
+    <div class="mode-grid mt">${simple}${full}</div>
+  </div>`;
+}
 function render() {
   if (!isActivated()) return renderLock();
+  if (!D.settings.mode) { document.body.classList.add('choosing'); $('#view').innerHTML = modeChooser(); window.scrollTo(0, 0); return; }
+  document.body.classList.remove('choosing');
   if (!views[state.view]) state.view = 'dash';
   $('#view').innerHTML = views[state.view]();
   document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === state.view));
@@ -2815,7 +2920,7 @@ function buildNav() {
   $('#brand-logo').innerHTML = icon('flow', 20);
   $('#modal-close').innerHTML = icon('x', 18);
   $('#side-install').innerHTML = installBtn('btn btn-sm btn-block');
-  $('#sidebar-nav').innerHTML = VIEWS.map(v => `<button class="nav-btn" data-action="go" data-id="${v.id}" data-nav="${v.id}">${icon(v.icon)}<span>${v.label}</span></button>`).join('');
+  $('#sidebar-nav').innerHTML = navViews().map(v => `<button class="nav-btn" data-action="go" data-id="${v.id}" data-nav="${v.id}">${icon(v.icon)}<span>${v.label}</span></button>`).join('');
   const bn = (id, ic, l) => `<button class="bn-btn" data-action="go" data-id="${id}" data-nav="${id}">${icon(ic, 22)}<span>${l}</span></button>`;
   $('#bottomnav').innerHTML = bn('dash', 'home', 'Accueil') + bn('journal', 'journal', 'Journal') +
     `<button class="bn-add" data-action="quick-expense" aria-label="Nouvelle dépense">${icon('plus', 26)}</button>` +
@@ -2862,6 +2967,7 @@ window.addEventListener('storage', e => { if (e.key === KEY) { D = load(); rende
   const l = getLic();
   if (!legacyOk(l) && l.sig) LIC_SIG_OK = await checkSig(l.sig);
   buildNav(); applyTheme(); render();
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 })();
 </script>
 </body>
