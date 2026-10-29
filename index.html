@@ -7,8 +7,7 @@
 <meta name="description" content="Budget Flow — gestion financière personnelle et suivi de petits projets, 100 % local.">
 <title>Budget Flow</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1371,7 +1370,18 @@ TLI.t=function(s){var V={
 const $ = s => document.querySelector(s);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const num = v => { const n = parseFloat(String(v ?? '').replace(/[\s\u202f\u00a0]/g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+// Montants : « 10.000 », « 10 000 », « 1.500.000 », « 2,500,000 » = séparateurs de milliers ; « 1,5 » = décimale.
+const numDec = v => {
+  let t = String(v ?? '').replace(/[\s\u202f\u00a0]/g, '').replace(/[^\d.,-]/g, '');
+  const lc = t.lastIndexOf(','), ld = t.lastIndexOf('.');
+  if (lc > -1 && ld > -1) t = lc > ld ? t.replace(/\./g, '').replace(',', '.') : t.replace(/,/g, '');
+  else t = t.replace(',', '.');
+  const n = parseFloat(t); return isFinite(n) ? n : 0;
+};
+const num = v => {
+  const t = String(v ?? '').replace(/[\s\u202f\u00a0]/g, '').replace(/[^\d.,-]/g, '');
+  return /^-?\d{1,3}([.,]\d{3})+$/.test(t) ? numDec(t.replace(/[.,]/g, '')) : numDec(t);
+};
 const sum = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const fmt = n => (isFinite(n) ? Math.round(n).toLocaleString('fr-FR') : '∞') + ' F';
@@ -2467,8 +2477,8 @@ function incomeForm(i = {}, mode = 'receipt') {
 }
 function incomePreview(f) {
   if (!f || !$('#incPrev')) return;
-  const cur = f.currency.value, rate = cur === 'FCFA' ? 1 : num(f.rate.value);
-  const x = {amount: num(f.amount.value), currency: cur, rate, feePct: num(f.feePct.value), feeFixed: num(f.feeFixed.value)};
+  const cur = f.currency.value, rate = cur === 'FCFA' ? 1 : numDec(f.rate.value);
+  const x = {amount: num(f.amount.value), currency: cur, rate, feePct: numDec(f.feePct.value), feeFixed: num(f.feeFixed.value)};
   f.rate.disabled = cur === 'FCFA';
   $('#incPrev').innerHTML = `<div class="kv"><span>Brut converti</span><b>${fmt(incomeGross(x))}</b></div><div class="kv"><span>Frais</span><b class="neg">−${fmt(incomeGross(x) - incomeNet(x))}</b></div><div class="kv total"><span>Net reçu</span><span class="pos">${fmt(incomeNet(x))}</span></div>`;
 }
@@ -2516,6 +2526,8 @@ function closeModal() { stopScan(); $('#modal').classList.remove('open'); $('#mo
 function openIncome(i, mode, title) { openModal(title, incomeForm(i, mode)); incomePreview($('#modal-body form')); }
 
 /* --- Traitement des formulaires --- */
+// Modifie un élément ; s'il a été supprimé entre-temps (autre onglet), il est recréé au lieu de bloquer.
+const upsert = (arr, id, data, base = {}) => { const o = arr.find(x => x.id === id); if (o) Object.assign(o, data); else arr.push({id, ...base, ...data}); };
 const forms = {
   async activate(f) {
     const lic = getLic(), c = sigOf(f.code);
@@ -2532,7 +2544,7 @@ const forms = {
     if (!f.catId) return toast('Choisissez une catégorie.', 'err');
     const data = {amount, catId: f.catId, note: (f.note || '').trim(), date: f.date || today()};
     state.lastCat = f.catId;
-    if (f.id) { Object.assign(D.expenses.find(x => x.id === f.id), data); toast('Dépense modifiée.'); }
+    if (f.id) { upsert(D.expenses, f.id, data, {ts: Date.now()}); toast('Dépense modifiée.'); }
     else {
       D.expenses.push({id: uid(), ts: Date.now(), ...data});
       if (f.fromScenario) D.scenarios = D.scenarios.filter(s => s.id !== f.fromScenario);
@@ -2547,17 +2559,17 @@ const forms = {
   income(f) {
     const amount = num(f.amount);
     if (amount <= 0) return toast('Montant invalide.', 'err');
-    const rate = f.currency === 'FCFA' ? 1 : num(f.rate);
+    const rate = f.currency === 'FCFA' ? 1 : numDec(f.rate);
     if (rate <= 0) return toast('Taux de change invalide.', 'err');
     if (f.currency !== 'FCFA') D.settings.rates[f.currency] = rate;
-    const data = {label: f.label.trim(), type: f.type, amount, currency: f.currency, rate, feePct: num(f.feePct), feeFixed: num(f.feeFixed)};
+    const data = {label: f.label.trim(), type: f.type, amount, currency: f.currency, rate, feePct: numDec(f.feePct), feeFixed: num(f.feeFixed)};
     if (f.mode === 'source') {
       data.day = parseInt(f.day) || null;
-      if (f.id) Object.assign(D.sources.find(x => x.id === f.id), data); else D.sources.push({id: uid(), ...data});
+      if (f.id) upsert(D.sources, f.id, data); else D.sources.push({id: uid(), ...data});
       toast('Source de revenu enregistrée.');
     } else {
       data.date = f.date || today();
-      if (f.id) Object.assign(D.incomes.find(x => x.id === f.id), data);
+      if (f.id) upsert(D.incomes, f.id, data, {ts: Date.now()});
       else {
         D.incomes.push({id: uid(), ts: Date.now(), sourceId: f.sourceId || null, ...data});
         if (f.fromScenario) D.scenarios = D.scenarios.filter(s => s.id !== f.fromScenario);
@@ -2570,7 +2582,7 @@ const forms = {
     const price = num(f.price);
     if (price <= 0) return toast('Prix invalide.', 'err');
     const data = {project: f.project.trim(), name: f.name.trim(), price, cost: num(f.cost)};
-    if (f.id) Object.assign(D.services.find(x => x.id === f.id), data); else D.services.push({id: uid(), ...data});
+    if (f.id) upsert(D.services, f.id, data); else D.services.push({id: uid(), ...data});
     save(); closeModal(); render(); toast('Service enregistré.');
   },
   saleN(f) {
@@ -2581,7 +2593,7 @@ const forms = {
   },
   cat(f) {
     const data = {name: f.name.trim(), icon: (f.icon || '📦').trim() || '📦', kind: f.kind, budget: num(f.budget)};
-    if (f.id) Object.assign(D.categories.find(x => x.id === f.id), data); else D.categories.push({id: uid(), ...data});
+    if (f.id) upsert(D.categories, f.id, data); else D.categories.push({id: uid(), ...data});
     save(); closeModal(); render(); toast('Catégorie enregistrée.');
   },
   caps(f) {
@@ -2607,7 +2619,7 @@ const forms = {
     const target = num(f.target);
     if (target <= 0) return toast('Montant cible invalide.', 'err');
     const data = {name: f.name.trim(), icon: (f.icon || '🎯').trim() || '🎯', target, deadline: f.deadline || ''};
-    if (f.id) Object.assign(D.goals.find(x => x.id === f.id), data); else D.goals.push({id: uid(), history: [], ...data});
+    if (f.id) upsert(D.goals, f.id, data, {history: []}); else D.goals.push({id: uid(), history: [], ...data});
     save(); closeModal(); render(); toast('Objectif enregistré.');
   },
   goalMove(f) {
@@ -2625,7 +2637,7 @@ const forms = {
   },
   initial(f) { D.settings.initialBalance = num(f.initialBalance); save(); closeModal(); render(); toast('Solde de départ enregistré.'); },
   rates(f) {
-    CURRENCIES.filter(c => c !== 'FCFA').forEach(c => { const v = num(f[c]); if (v > 0) D.settings.rates[c] = v; });
+    CURRENCIES.filter(c => c !== 'FCFA').forEach(c => { const v = numDec(f[c]); if (v > 0) D.settings.rates[c] = v; });
     save(); render(); toast('Taux enregistrés.');
   }
 };
@@ -2673,7 +2685,7 @@ const actions = {
   'edit-source': id => openIncome(findIn(D.sources, id), 'source', 'Modifier la source'),
   'del-source': id => { if (confirm('Supprimer cette source ? Les encaissements passés sont conservés.')) { D.sources = D.sources.filter(x => x.id !== id); save(); closeModal(); render(); } },
   'cash-source': id => { const s = findIn(D.sources, id); const {id: _i, day: _d, ...rest} = s; openIncome({...rest, sourceId: s.id, date: today()}, 'receipt', 'Encaisser : ' + s.label); },
-  'conv-save': () => openIncome({label: 'Transfert reçu', type: 'Transfert reçu', amount: num($('#cvAmt').value) || '', currency: $('#cvCur').value, rate: num($('#cvRate').value), feePct: num($('#cvPct').value), feeFixed: num($('#cvFix').value)}, 'receipt', 'Revenu reçu'),
+  'conv-save': () => openIncome({label: 'Transfert reçu', type: 'Transfert reçu', amount: num($('#cvAmt').value) || '', currency: $('#cvCur').value, rate: numDec($('#cvRate').value), feePct: numDec($('#cvPct').value), feeFixed: num($('#cvFix').value)}, 'receipt', 'Revenu reçu'),
   'add-service': () => openModal('Nouveau service', serviceForm({})),
   'edit-service': id => openModal('Modifier le service', serviceForm(findIn(D.services, id))),
   'del-service': id => {
@@ -2750,7 +2762,7 @@ const actions = {
 const live = {
   conv(t) {
     if (t.id === 'cvCur') $('#cvRate').value = D.settings.rates[t.value] || '';
-    $('#cvOut').innerHTML = convHtml(num($('#cvAmt').value), $('#cvCur').value, num($('#cvRate').value), num($('#cvPct').value), num($('#cvFix').value));
+    $('#cvOut').innerHTML = convHtml(num($('#cvAmt').value), $('#cvCur').value, numDec($('#cvRate').value), numDec($('#cvPct').value), num($('#cvFix').value));
   },
   habit() { $('#hOut').innerHTML = habitOut(num($('#hAmt').value), $('#hPer').value); },
   simtest(t) { $('#simOut').innerHTML = simVerdict(num(t.value)); },
@@ -2764,7 +2776,9 @@ const live = {
         const d = JSON.parse(r.result);
         if (!d || !Array.isArray(d.categories) || !Array.isArray(d.expenses)) throw new Error('format');
         if (!confirm('Remplacer les données actuelles par celles de la sauvegarde ?')) return;
-        localStorage.setItem(KEY, JSON.stringify(d)); D = load(); save(); applyTheme(); render(); toast('Sauvegarde restaurée.');
+        try { localStorage.setItem(KEY, JSON.stringify(d)); }
+        catch (e) { return toast('Restauration impossible : la mémoire du téléphone est pleine. Libérez de la place puis réessayez.', 'err'); }
+        D = load(); save(); applyTheme(); render(); toast('Sauvegarde restaurée.');
       } catch (e) { toast('Fichier invalide : ce n’est pas une sauvegarde Budget Flow.', 'err'); }
     };
     r.readAsText(file); t.value = '';
