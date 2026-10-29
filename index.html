@@ -259,6 +259,7 @@ body.locked .app,body.locked .bottomnav{display:none}
 .steps{display:flex;flex-direction:column;gap:9px;font-size:14px}
 .step{display:flex;gap:10px;align-items:flex-start}
 .step .n{width:24px;height:24px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0}
+.trial-box{background:var(--primary-soft);border:1.5px solid var(--primary);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;text-align:center}
 .dev-box{background:var(--surface2);border:1px dashed var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .dev-id{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:24px;font-weight:800;letter-spacing:.08em}
 a.btn{text-decoration:none}
@@ -505,6 +506,22 @@ var TLL=(function(){
 
 /* Dictionnaire français → anglais */
 var TLL_EN={
+"Essai gratuit : il reste {}": "Free trial: {} left",
+"Essai gratuit en cours : il reste {}": "Free trial running: {} left",
+"← Continuer l'essai gratuit": "← Continue the free trial",
+"Votre essai gratuit de 24 h est terminé. Vos données sont conservées : activez Budget Flow pour les retrouver.": "Your 24-hour free trial has ended. Your data is kept: activate Budget Flow to get it back.",
+"🎁 Essayez gratuitement pendant 24 h": "🎁 Try it free for 24 hours",
+"Essayez gratuitement pendant 24 h": "Try it free for 24 hours",
+"Accès complet, sans paiement ni engagement. Ensuite, un code d'activation sera demandé ; vos données seront conservées.": "Full access, no payment, no commitment. After that, an activation code is required; your data is kept.",
+"Commencer l'essai gratuit": "Start the free trial",
+"Essai gratuit activé : 24 h pour tout découvrir !": "Free trial started: 24 hours to explore everything!",
+"🎁 Essai gratuit": "🎁 Free trial",
+"Essai gratuit": "Free trial",
+"Temps restant": "Time left",
+"🔑 Activer maintenant": "🔑 Activate now",
+"Activer maintenant": "Activate now",
+"Puis-je essayer avant d'acheter ?": "Can I try before buying?",
+"Oui : sur l'écran d'activation, touchez « Commencer l'essai gratuit » pour utiliser Budget Flow pendant 24 h sans code (une seule fois par téléphone). À la fin, l'appli demande un code d'activation ; vos données sont conservées.": "Yes: on the activation screen, tap “Start the free trial” to use Budget Flow for 24 hours without a code (once per phone). Afterwards the app asks for an activation code; your data is kept.",
 "Sauvegarde annulée.": "Backup cancelled.",
 "Sauvegarde envoyée ✓": "Backup sent ✓",
 "Sauvegarde téléchargée. Gardez le fichier en lieu sûr (WhatsApp, Drive…).": "Backup downloaded. Keep the file somewhere safe (WhatsApp, Drive…).",
@@ -1594,6 +1611,43 @@ async function checkSig(sig) {
   } catch (e) { return false; }
 }
 function unlockApp() { document.body.classList.remove('locked'); $('#lock').innerHTML = ''; render(); toast('Budget Flow est activé. Bienvenue !'); }
+
+/* ---------- ESSAI GRATUIT 24 H ----------
+   • Bouton « Commencer l'essai gratuit » sur l'écran d'activation : 24 h d'accès
+     complet, une seule fois par appareil (début stocké avec la licence).
+   • « Tout effacer » ne remet pas l'essai à zéro.
+   • Horloge du téléphone reculée de plus de 10 min → essai considéré terminé.
+   • À la fin, l'appli se verrouille et demande un code ; les données sont conservées. */
+const TRIAL_MS = 24 * 3600 * 1000;
+let trialTimer = null;
+function trialInfo() {
+  const lic = getLic(), start = +lic.trial || 0;
+  if (!start) return {started: false, active: false, left: 0};
+  const now = Date.now(), seen = Math.max(+lic.seen || 0, start);
+  const left = now < seen - 10 * 60 * 1000 ? 0 : Math.max(0, start + TRIAL_MS - now);
+  return {started: true, active: left > 0, left};
+}
+const canUse = () => isActivated() || trialInfo().active;
+function trialTouch() { const lic = getLic(); if (!lic.trial) return; lic.seen = Math.max(+lic.seen || 0, Date.now()); try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) {} }
+const fmtLeft = ms => { const m = Math.max(1, Math.ceil(ms / 60000)), h = Math.floor(m / 60); return h ? `${h} h ${String(m % 60).padStart(2, '0')} min` : `${m} min`; };
+function trialBar() {
+  if (isActivated()) return '';
+  const ti = trialInfo(); if (!ti.active) return '';
+  return `<div id="trialBar" class="alert alert-amber no-print" style="margin-bottom:14px;align-items:center"><span class="a-ic">🎁</span><span style="flex:1">Essai gratuit : il reste ${fmtLeft(ti.left)}</span><button class="btn btn-sm btn-primary" data-action="trial-buy">Activer</button></div>`;
+}
+function trialTick() {
+  if (isActivated()) { clearInterval(trialTimer); trialTimer = null; return; }
+  trialTouch();
+  if (!trialInfo().active) { clearInterval(trialTimer); trialTimer = null; closeModal(); renderLock(); window.scrollTo(0, 0); return; }
+  const bar = $('#trialBar'); if (bar) bar.outerHTML = trialBar();
+}
+function enterTrial(first) {
+  trialTouch();
+  document.body.classList.remove('locked'); $('#lock').innerHTML = ''; render();
+  if (!trialTimer) trialTimer = setInterval(trialTick, 30000);
+  if (first) toast('Essai gratuit activé : 24 h pour tout découvrir !');
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && trialTimer) trialTick(); });
 /* ---------- QR code : générateur intégré (hors ligne) + lecteur caméra ---------- */
 const QR=(()=>{
   const ECC={L:[-1,7,10,15,20,26,18,20,24,30,18,20,24,26,30,22,24,28,30,28,28,28,28,30,30,26,28,30,30,30,30,30,30,30,30,30,30,30,30,30,30],M:[-1,10,16,26,18,24,16,18,22,22,26,30,22,22,24,24,28,28,26,26,26,26,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28]};
@@ -1663,12 +1717,18 @@ function stopScan(){clearInterval(scanTimer);scanTimer=null;if(scanStream){scanS
 const waLink = text => `https://wa.me/${CONTACT}?text=${encodeURIComponent(text)}`;
 
 function renderLock(err = '') {
-  const lic = getLic();
+  const lic = getLic(), ti = trialInfo();
   document.body.classList.add('locked');
+  const trialHtml = ti.active
+    ? `<div class="alert alert-amber"><span class="a-ic">🎁</span><span>Essai gratuit en cours : il reste ${fmtLeft(ti.left)}</span></div><button type="button" class="btn btn-block" data-action="trial-back">← Continuer l'essai gratuit</button>`
+    : ti.started
+      ? `<div class="alert alert-amber"><span class="a-ic">⏳</span><span>Votre essai gratuit de 24 h est terminé. Vos données sont conservées : activez Budget Flow pour les retrouver.</span></div>`
+      : `<div class="trial-box"><b>🎁 Essayez gratuitement pendant 24 h</b><span class="hint">Accès complet, sans paiement ni engagement. Ensuite, un code d'activation sera demandé ; vos données seront conservées.</span><button type="button" class="btn btn-primary btn-block" data-action="trial-start">Commencer l'essai gratuit</button></div>`;
   const msg = `Bonjour, je souhaite obtenir Budget Flow (${PRICE}). Mon code appareil : ${lic.dev}`;
   $('#lock').innerHTML = `<div class="lock-wrap"><div class="lock-card ${err ? 'shake' : ''}">
     <div><div class="brand" style="padding:0 0 4px"><div class="brand-logo">${icon('flow', 20)}</div>Budget Flow</div><p class="hint">par ${TEAM}</p></div>
     <div><h1 class="lock-title">Activez votre application</h1><p class="sub mt-s">Budget Flow fonctionne avec un code d'accès personnel, lié à cet appareil.</p>${TLL.switcher()}</div>
+    ${trialHtml}
     <div class="steps">
       <div class="step"><span class="n">1</span><span>Copiez votre <b>code appareil</b> ci-dessous.</span></div>
       <div class="step"><span class="n">2</span><span>Envoyez-le sur WhatsApp et réglez <b>${PRICE}</b> (paiement unique).</span></div>
@@ -2455,6 +2515,7 @@ const GUIDE = [
   ['❓ Questions fréquentes', `<ul>
     <li><b>Faut-il Internet ?</b> Seulement la toute première fois, pour installer l'appli. Ensuite, tout fonctionne hors ligne.</li>
     <li><b>Mes données sont-elles visibles par quelqu'un ?</b> Non, elles ne quittent jamais votre appareil.</li>
+    <li><b>Puis-je essayer avant d'acheter ?</b> Oui : sur l'écran d'activation, touchez « Commencer l'essai gratuit » pour utiliser Budget Flow pendant 24 h sans code (une seule fois par téléphone). À la fin, l'appli demande un code d'activation ; vos données sont conservées.</li>
     <li><b>J'ai vidé les données du navigateur.</b> Les données sont effacées : restaurez votre dernière sauvegarde. Il faudra peut-être un nouveau code d'activation.</li>
     <li><b>Je me suis trompé dans une dépense.</b> Touchez ✎ à côté de la dépense pour la modifier ou la supprimer.</li></ul>`]
 ];
@@ -2522,7 +2583,8 @@ views.reglages = () => {
     <div class="card">
       <h2>Licence</h2>
       <div class="mt">
-        <div class="kv"><span>Statut</span><span class="badge b-green">✓ Activée</span></div>
+        <div class="kv"><span>Statut</span>${isActivated() ? '<span class="badge b-green">✓ Activée</span>' : '<span class="badge b-amber">🎁 Essai gratuit</span>'}</div>
+        ${isActivated() ? '' : `<div class="kv"><span>Temps restant</span><b>${fmtLeft(trialInfo().left)}</b></div><div class="mt-s"><button class="btn btn-sm btn-primary" data-action="trial-buy">🔑 Activer maintenant</button></div>`}
         <div class="kv"><span>Code appareil</span><b style="font-family:ui-monospace,monospace">${getLic().dev}</b></div>
         <div class="kv"><span>Éditeur</span><b>${TEAM}</b></div>
         <div class="kv"><span>Assistance</span><a class="link-btn" href="${waLink('Bonjour, j’ai besoin d’aide avec Budget Flow.')}" target="_blank" rel="noopener">WhatsApp ${CONTACT_FMT}</a></div>
@@ -2726,6 +2788,9 @@ const actions = {
   go: id => go(id),
   more: () => openModal('Toutes les sections', `<div class="more-grid">${navViews().map(v => `<button class="nav-btn ${state.view === v.id ? 'active' : ''}" data-action="go" data-id="${v.id}">${icon(v.icon, 22)}<span>${v.label}</span></button>`).join('')}</div>`),
   'close-modal': closeModal,
+  'trial-start': () => { const lic = getLic(); if (lic.trial) return renderLock(); lic.trial = lic.seen = Date.now(); try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) {} enterTrial(true); },
+  'trial-back': () => { if (trialInfo().active) enterTrial(false); else renderLock(); },
+  'trial-buy': () => { closeModal(); renderLock(); window.scrollTo(0, 0); },
   'lock-copy': () => copyText(getLic().dev),
   'lock-qr': () => { const d = getLic().dev; openModal('Votre code appareil', `<p class="sub" style="text-align:center">Le vendeur scanne ce QR code avec Thousand Admin.</p><div id="qrBox"></div><div class="dev-id" style="text-align:center">${d}</div>`); $('#qrBox').appendChild(QR.canvas('BFID:' + d, 600, 'M')); },
   'lock-scan': () => {
@@ -2892,11 +2957,12 @@ function modeChooser(inSettings = false) {
   </div>`;
 }
 function render() {
-  if (!isActivated()) return renderLock();
+  if (!canUse()) return renderLock();
   if (!D.settings.mode) { document.body.classList.add('choosing'); $('#view').innerHTML = modeChooser(); window.scrollTo(0, 0); return; }
   document.body.classList.remove('choosing');
   if (!views[state.view]) state.view = 'dash';
   $('#view').innerHTML = views[state.view]();
+  if (!isActivated()) $('#view').insertAdjacentHTML('afterbegin', trialBar());
   document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === state.view));
 }
 function go(v) {
@@ -2967,6 +3033,7 @@ window.addEventListener('storage', e => { if (e.key === KEY) { D = load(); rende
   const l = getLic();
   if (!legacyOk(l) && l.sig) LIC_SIG_OK = await checkSig(l.sig);
   buildNav(); applyTheme(); render();
+  if (!isActivated() && trialInfo().active) { trialTouch(); trialTimer = setInterval(trialTick, 30000); }
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 })();
 </script>
