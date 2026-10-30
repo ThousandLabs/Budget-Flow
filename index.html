@@ -210,6 +210,26 @@ main{flex:1;min-width:0}
 
 /* Graphiques */
 .donut-wrap{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+:root[data-wallet="pro"]{--primary:#4f46e5;--primary-soft:#e0e7ff}
+:root[data-wallet="pro"] .hero{background:linear-gradient(135deg,#4338ca 0%,#6d28d9 100%)}
+:root[data-theme="dark"][data-wallet="pro"]{--primary:#a5b4fc;--primary-soft:#262a5c}
+.wbar{display:flex;align-items:center;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+.wpill{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--primary);background:var(--primary-soft);color:var(--text);font-weight:700;font-size:14px;cursor:pointer;max-width:100%}
+.wpill .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wpill small{font-weight:600;color:var(--muted);font-size:12px}
+.wlist{display:flex;flex-direction:column;gap:8px}
+.witem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--text);font:inherit}
+.witem.on{border-color:var(--primary);background:var(--primary-soft)}
+.witem .ic{font-size:24px;flex:none}.witem .gr{flex:1;min-width:0}.witem b{display:block}.witem small{color:var(--muted);font-size:12.5px}
+.seg2{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.seg2 button{height:34px;padding:0 12px;font-weight:700;font-size:13px;background:var(--surface2);color:var(--muted);border:0;cursor:pointer}
+.seg2 button.on{background:var(--primary);color:#fff}
+:root[data-theme="dark"] .seg2 button.on{color:#0a0f1c}
+.cbars{display:flex;flex-direction:column;gap:11px}
+.cbar .top{display:flex;justify-content:space-between;gap:8px;font-size:13.5px}
+.cbar .top .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbar .trk{height:12px;border-radius:99px;background:var(--surface2);overflow:hidden;margin-top:5px;border:1px solid var(--border)}
+.cbar .trk i{display:block;height:100%;border-radius:99px}
 .donut{width:170px;height:170px;flex-shrink:0;margin:0 auto}
 .donut-t1{font-size:4.6px;font-weight:800;fill:var(--text)}
 .donut-t2{font-size:2.8px;fill:var(--muted)}
@@ -311,6 +331,7 @@ body.choosing .sidebar,body.choosing .bottomnav{display:none}
   <!-- Barre latérale (ordinateur) -->
   <aside class="sidebar">
     <div class="brand"><div class="brand-logo" id="brand-logo"></div>Budget Flow</div>
+    <div id="side-wallet" style="margin:-8px 0 12px"></div>
     <nav id="sidebar-nav" style="display:flex;flex-direction:column;gap:3px"></nav>
     <div class="side-foot">
       <span id="side-install"></span>
@@ -506,6 +527,46 @@ var TLL=(function(){
 
 /* Dictionnaire français → anglais */
 var TLL_EN={
+"Bilan de fin de mois": "End-of-month review",
+"Où est parti mon argent ?": "Where did my money go?",
+"🍩 Camembert": "🍩 Pie",
+"📊 Barres": "📊 Bars",
+"Voir le bilan détaillé et les conseils": "See the detailed review and tips",
+"Mes portefeuilles": "My wallets",
+"Chaque portefeuille a son propre solde, ses dépenses, ses budgets et son mode survie. Rien ne se mélange.": "Each wallet has its own balance, expenses, budgets and survival mode. Nothing gets mixed up.",
+"Commerce / projet": "Business / project",
+"Argent personnel": "Personal money",
+" · actif": " · active",
+"➕ Nouveau portefeuille": "➕ New wallet",
+"Nom": "Name",
+"Type": "Type",
+"Ex : Ma boutique, Business Wax, Projet T-shirts": "E.g. My shop, Wax business, T-shirt project",
+"🏪 Commerce / projet (catégories pro)": "🏪 Business / project (business categories)",
+"👤 Personnel": "👤 Personal",
+"Créer et ouvrir": "Create and open",
+"✏️ Portefeuille actif": "✏️ Active wallet",
+"Renommer": "Rename",
+"🗑️ Supprimer ce portefeuille": "🗑️ Delete this wallet",
+"💾 La sauvegarde (Réglages) concerne le portefeuille actif : faites-en une par portefeuille.": "💾 Backups (Settings) cover the active wallet: make one per wallet.",
+"Un commerce ou un projet à suivre à part ? Touchez le portefeuille.": "A business or project to track separately? Tap the wallet.",
+"Personnel": "Personal",
+"Perso": "Personal",
+"Pro": "Business",
+"Portefeuille renommé.": "Wallet renamed.",
+"Portefeuille supprimé.": "Wallet deleted.",
+"8 portefeuilles maximum.": "8 wallets maximum.",
+"Changer de portefeuille": "Switch wallet",
+"Achats de marchandises": "Stock purchases",
+"Loyer du local": "Shop rent",
+"Électricité / eau (local)": "Electricity / water (shop)",
+"Internet / téléphone pro": "Business internet / phone",
+"Transport & livraison": "Transport & delivery",
+"Salaires & aides": "Wages & helpers",
+"Publicité & réseaux sociaux": "Advertising & social media",
+"Emballages & fournitures": "Packaging & supplies",
+"Matériel & outils": "Equipment & tools",
+"Impôts, taxes & frais": "Taxes & fees",
+"Frais Wave / Orange Money": "Wave / Orange Money fees",
 "Pendant l'essai gratuit, seules les sauvegardes faites sur ce téléphone peuvent être restaurées. Activez Budget Flow pour récupérer une sauvegarde d'un autre appareil.":"During the free trial, only backups made on this phone can be restored. Activate Budget Flow to restore a backup from another device.",
 "Essai gratuit : il reste {}": "Free trial: {} left",
 "Essai gratuit en cours : il reste {}": "Free trial running: {} left",
@@ -1538,9 +1599,31 @@ const defaultData = () => ({
   scenarios: []   // scénarios du simulateur
 });
 
+/* ---------- Portefeuilles séparés (perso / commerce / projet) ----------
+   Chaque portefeuille a ses propres données, rangées à part dans le téléphone :
+   les dépenses d'un commerce ne touchent jamais le solde ni le mode survie perso. */
+const WKEY = 'budgetflow_wallets';
+const PRO_CATS = [
+  ['Achats de marchandises','variable','📦'], ['Loyer du local','fixe','🏬'], ['Électricité / eau (local)','fixe','⚡'],
+  ['Internet / téléphone pro','fixe','📶'], ['Transport & livraison','variable','🚚'], ['Salaires & aides','fixe','👥'],
+  ['Publicité & réseaux sociaux','variable','📣'], ['Emballages & fournitures','variable','🛍️'], ['Matériel & outils','variable','🧰'],
+  ['Impôts, taxes & frais','variable','🧾'], ['Frais Wave / Orange Money','variable','💸'], ['Imprévus','variable','⚠️']
+].map(([name, kind, ic], i) => ({id: 'p' + i, name, kind, icon: ic, budget: 0}));
+function loadW() {
+  let w = null; try { w = JSON.parse(localStorage.getItem(WKEY)); } catch (e) {}
+  if (!w || !Array.isArray(w.list) || !w.list.length) w = {active: 'main', list: [{id: 'main', name: 'Personnel', icon: '👤', kind: 'perso'}]};
+  if (!w.list.some(x => x.id === w.active)) w.active = w.list[0].id;
+  return w;
+}
+let W = loadW();
+const saveW = () => { try { localStorage.setItem(WKEY, JSON.stringify(W)); } catch (e) {} };
+const wKey = id => id === 'main' ? KEY : KEY + '__' + id;
+const dataKey = () => wKey(W.active);
+const curWallet = () => W.list.find(x => x.id === W.active) || W.list[0];
+const multiW = () => W.list.length > 1;
 function load() {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(dataKey());
     if (raw) {
       const d = Object.assign(defaultData(), JSON.parse(raw));
       const base = defaultData().settings;
@@ -1554,7 +1637,7 @@ function load() {
 }
 let D = load();
 function save() {
-  try { localStorage.setItem(KEY, JSON.stringify(D)); }
+  try { localStorage.setItem(dataKey(), JSON.stringify(D)); }
   catch (e) { toast('Sauvegarde impossible : stockage du navigateur plein ou bloqué.', 'err'); }
 }
 
@@ -1877,7 +1960,7 @@ const ADV_VIEWS = ['proj', 'sim', 'secours', 'bilan'];
 const isSimple = () => D.settings.mode === 'simple';
 const navViews = () => VIEWS.filter(v => !isSimple() || !ADV_VIEWS.includes(v.id));
 const usesAdvanced = () => !!(D.scenarios.length || D.habits.length || D.emergency.length || D.settings.caps.day || D.settings.caps.week || D.settings.caps.month);
-const state = {view: 'dash', journalMonth: curMonth(), bilanMonth: curMonth(), jq: '', jcat: '', lastCat: null};
+const state = {view: 'dash', chartMonth: curMonth(), journalMonth: curMonth(), bilanMonth: curMonth(), jq: '', jcat: '', lastCat: null};
 
 const field = (label, input, hint = '') => `<label class="field"><span class="label">${label}</span>${input}${hint ? `<span class="hint">${hint}</span>` : ''}</label>`;
 const stat = (k, v, s = '', cls = '') => `<div class="card stat"><div class="k">${k}</div><div class="v ${cls}">${v}</div>${s ? `<div class="s">${s}</div>` : ''}</div>`;
@@ -1893,6 +1976,65 @@ const amountInput = (name, val = '', extra = '') => `<input class="input" name="
    ========================================================================= */
 const views = {};
 
+
+/* ---------- « Où est parti mon argent ? » : camembert ou barres, mois par mois ---------- */
+function spendChart() {
+  const mk = state.chartMonth || curMonth(), ms = monthStats(mk), prev = monthStats(shiftMonth(mk, -1));
+  const type = D.settings.chartType === 'bars' ? 'bars' : 'pie';
+  const isCur = mk === curMonth(), endOfMonth = !isCur || parseD(today()).getDate() >= 25;
+  let cats = Object.entries(ms.byCat).map(([id, v]) => ({c: catById(id), v, id})).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+  if (cats.length > 6) { const rest = cats.slice(5); cats = cats.slice(0, 5).concat([{c: {icon: '➕', name: 'Autres (' + rest.length + ')'}, v: sum(rest, x => x.v), id: '_other'}]); }
+  const max = cats.length ? cats[0].v : 0;
+  const tog = `<div class="seg2 no-print"><button class="${type === 'pie' ? 'on' : ''}" data-action="chart-type" data-id="pie">🍩 Camembert</button><button class="${type === 'bars' ? 'on' : ''}" data-action="chart-type" data-id="bars">📊 Barres</button></div>`;
+  let body;
+  if (!ms.exp) body = empty('Aucune dépense en ' + monthLabel(mk) + '.');
+  else if (type === 'pie') body = `<div class="donut-wrap mt">${donut(cats, ms.exp)}<div class="legend">${cats.map((x, i) => `<div class="row"><span class="dot" style="background:${COLORS[i % COLORS.length]}"></span><span class="nm">${x.c.icon} ${esc(x.c.name)}</span><b>${Math.round(x.v / ms.exp * 100)} %</b><span class="muted" style="min-width:76px;text-align:right">${fmt(x.v)}</span></div>`).join('')}</div></div>`;
+  else body = `<div class="cbars mt">${cats.map((x, i) => `<div class="cbar"><div class="top"><span class="nm">${x.c.icon} ${esc(x.c.name)}</span><span><b>${fmt(x.v)}</b> <span class="muted">· ${Math.round(x.v / ms.exp * 100)} %</span></span></div><div class="trk"><i style="width:${(x.v / max * 100).toFixed(1)}%;background:${COLORS[i % COLORS.length]}"></i></div></div>`).join('')}</div>`;
+  // Repères pour ajuster le mois suivant
+  const tips = [];
+  if (ms.exp && cats.length) {
+    const t = cats[0], pv = t.id !== '_other' ? (prev.byCat[t.id] || 0) : 0;
+    tips.push(`${t.c.icon} <b>${esc(t.c.name)}</b> est votre 1er poste : ${Math.round(t.v / ms.exp * 100)} % des dépenses` + (pv ? (Math.round((t.v - pv) / pv * 100) === 0 ? ` (stable vs ${MONTHS[parseD(shiftMonth(mk, -1) + '-01').getMonth()]})` : ` (${t.v >= pv ? '+' : ''}${Math.round((t.v - pv) / pv * 100)} % vs ${MONTHS[parseD(shiftMonth(mk, -1) + '-01').getMonth()]})`) : '') + '.');
+    const over = D.categories.filter(c => c.budget > 0 && (ms.byCat[c.id] || 0) > c.budget);
+    if (over.length) tips.push('⚠️ Budget dépassé : ' + over.slice(0, 3).map(c => `${c.icon} ${esc(c.name)} (+${fmt((ms.byCat[c.id] || 0) - c.budget)})`).join(', ') + '. Ajustez ces enveloppes ou ces habitudes le mois prochain.');
+    if (prev.exp) { const d = (ms.exp - prev.exp) / prev.exp * 100; if (Math.abs(d) >= 5) tips.push(`${d > 0 ? '📈' : '📉'} Total ${d > 0 ? 'en hausse' : 'en baisse'} de ${Math.abs(Math.round(d))} % par rapport au mois précédent.`); }
+  }
+  return `<div class="card mt2">
+    <div class="card-head" style="flex-wrap:wrap;gap:8px"><h2>📊 ${endOfMonth ? 'Bilan de fin de mois' : 'Où est parti mon argent ?'}</h2>${tog}</div>
+    ${monthNav(mk, 'cm-prev', 'cm-next')}
+    ${ms.exp ? `<p class="sub mt-s">${fmt(ms.exp)} dépensés en ${monthLabel(mk)} · ${ms.count} opération(s)</p>` : ''}
+    ${body}
+    ${tips.length ? `<div class="stack mt">${tips.map(t => `<div class="alert alert-blue"><span>${t}</span></div>`).join('')}</div>` : ''}
+    ${!isSimple() && ms.exp ? `<p class="hint mt"><button class="link-btn" data-action="go" data-id="bilan">Voir le bilan détaillé et les conseils</button></p>` : ''}
+  </div>`;
+}
+
+/* ---------- Bascule entre portefeuilles ---------- */
+function walletBar() {
+  const w = curWallet();
+  return `<div class="wbar no-print"><button class="wpill" data-action="wallets" aria-label="Changer de portefeuille"><span>${w.icon}</span><span class="nm">${esc(w.name)}</span><small>${w.kind === 'pro' ? 'Pro' : 'Perso'}</small><span aria-hidden="true">▾</span></button>${multiW() ? '' : '<span class="hint">Un commerce ou un projet à suivre à part ? Touchez le portefeuille.</span>'}</div>`;
+}
+function walletsModal() {
+  openModal('Mes portefeuilles', `<p class="sub">Chaque portefeuille a son propre solde, ses dépenses, ses budgets et son mode survie. Rien ne se mélange.</p>
+    <div class="wlist mt">${W.list.map(x => `<button class="witem ${x.id === W.active ? 'on' : ''}" data-action="wallet-switch" data-id="${x.id}"><span class="ic">${x.icon}</span><span class="gr"><b>${esc(x.name)}</b><small>${x.kind === 'pro' ? 'Commerce / projet' : 'Argent personnel'}${x.id === W.active ? ' · actif' : ''}</small></span>${x.id === W.active ? '✓' : ''}</button>`).join('')}</div>
+    <form data-form="wallet-new" class="card mt" style="padding:14px"><h3 style="margin:0 0 6px">➕ Nouveau portefeuille</h3>
+      ${field('Nom', '<input class="input" name="name" required maxlength="30" placeholder="Ex : Ma boutique, Business Wax, Projet T-shirts">')}
+      ${field('Type', '<select class="input" name="kind"><option value="pro">🏪 Commerce / projet (catégories pro)</option><option value="perso">👤 Personnel</option></select>')}
+      <button class="btn btn-primary btn-block mt-s">Créer et ouvrir</button></form>
+    <div class="card mt" style="padding:14px"><h3 style="margin:0 0 8px">✏️ Portefeuille actif</h3>
+      <form data-form="wallet-rename" class="flex" style="gap:8px"><input class="input" name="name" required maxlength="30" value="${esc(curWallet().name)}"><button class="btn">Renommer</button></form>
+      ${W.active !== 'main' ? `<button class="btn btn-block mt" style="color:var(--red)" data-action="wallet-delete">🗑️ Supprimer ce portefeuille</button>` : ''}
+      <p class="hint mt-s">💾 La sauvegarde (Réglages) concerne le portefeuille actif : faites-en une par portefeuille.</p></div>`);
+}
+function switchWallet(id) {
+  if (id === W.active || !W.list.some(x => x.id === id)) return closeModal();
+  save(); const theme = D.settings.theme, mode = D.settings.mode;
+  W.active = id; saveW(); D = load();
+  if (!D.settings.mode) D.settings.mode = mode; D.settings.theme = theme; save();
+  state.chartMonth = curMonth(); applyTheme(); buildNav(); closeModal(); go('dash');
+  toast(curWallet().icon + ' Portefeuille « ' + curWallet().name + ' »');
+}
+
 /* ---------- ACCUEIL (tableau de bord + mode survie) ---------- */
 views.dash = () => {
   const t = totals(), sv = survival(), mk = curMonth(), ms = monthStats(mk), caps = D.settings.caps;
@@ -1905,6 +2047,7 @@ views.dash = () => {
   const capSub = (s, c) => c ? (s > c ? `<span class="neg">dépassé de ${fmt(s - c)}</span>` : `reste ${fmt(c - s)} sur ${fmt(c)}`) : 'aucun plafond';
 
   return `
+  ${walletBar()}
   ${head(capFirst(dateDay(today())), 'Tableau de bord', '', `<button class="btn btn-primary hide-m" data-action="quick-expense">${icon('plus', 18)} Dépense</button>`)}
   ${isNew ? `
   <div class="card mt" style="border:2px dashed var(--primary);margin-bottom:16px">
@@ -1945,7 +2088,8 @@ views.dash = () => {
       <div class="card-head"><h2>Dernières dépenses</h2><button class="btn btn-sm" data-action="go" data-id="journal">Journal</button></div>
       <div class="list">${recent.length ? recent.map(expenseItem).join('') : empty('Aucune dépense enregistrée.')}</div>
     </div>
-  </div>`;
+  </div>
+  ${spendChart()}`;
 };
 
 function survivalCard(sv) {
@@ -2513,7 +2657,7 @@ views.guide = () => `
 
 /* ---------- RÉGLAGES & SAUVEGARDE ---------- */
 views.reglages = () => {
-  const s = D.settings, size = new Blob([localStorage.getItem(KEY) || '']).size;
+  const s = D.settings, size = new Blob([localStorage.getItem(dataKey()) || '']).size;
   return `
   ${head('Configuration', 'Réglages')}
   <div class="grid g2">
@@ -2652,6 +2796,16 @@ function openIncome(i, mode, title) { openModal(title, incomeForm(i, mode)); inc
 // Modifie un élément ; s'il a été supprimé entre-temps (autre onglet), il est recréé au lieu de bloquer.
 const upsert = (arr, id, data, base = {}) => { const o = arr.find(x => x.id === id); if (o) Object.assign(o, data); else arr.push({id, ...base, ...data}); };
 const forms = {
+  'wallet-new': v => {
+    const name = String(v.name || '').trim().slice(0, 30); if (!name) return;
+    if (W.list.length >= 8) return toast('8 portefeuilles maximum.', 'warn');
+    const kind = v.kind === 'perso' ? 'perso' : 'pro', id = 'w' + Date.now().toString(36);
+    const d = defaultData(); if (kind === 'pro') d.categories = PRO_CATS.map(c => ({...c}));
+    d.settings.theme = D.settings.theme; d.settings.mode = D.settings.mode || 'simple';
+    try { localStorage.setItem(wKey(id), JSON.stringify(d)); } catch (e) { return toast('Mémoire du téléphone pleine.', 'err'); }
+    W.list.push({id, name, icon: kind === 'pro' ? '🏪' : '👤', kind}); saveW(); switchWallet(id);
+  },
+  'wallet-rename': v => { const name = String(v.name || '').trim().slice(0, 30); if (!name) return; curWallet().name = name; saveW(); buildNav(); closeModal(); render(); toast('Portefeuille renommé.'); },
   async activate(f) {
     const lic = getLic(), c = sigOf(f.code);
     if (!c) return renderLock("Collez votre code d'activation.");
@@ -2871,6 +3025,20 @@ const actions = {
     openModal(`${dir === 'in' ? 'Verser vers' : 'Retirer de'} « ${g.name} »`, moveForm('goalMove', id, dir, 0, dir === 'in' ? `Disponible : ${fmt(totals().balance)}` : `Épargné : ${fmt(goalSaved(g))}`)); },
 
   // Bilan
+  'cm-prev': () => { state.chartMonth = shiftMonth(state.chartMonth || curMonth(), -1); render(); },
+  'cm-next': () => { const n = shiftMonth(state.chartMonth || curMonth(), 1); if (n <= curMonth()) { state.chartMonth = n; render(); } },
+  'chart-type': id => { D.settings.chartType = id === 'bars' ? 'bars' : 'pie'; save(); render(); },
+  wallets: () => walletsModal(),
+  'wallet-switch': id => switchWallet(id),
+  'wallet-delete': () => {
+    const w = curWallet(); if (w.id === 'main') return;
+    if (!confirm('Supprimer le portefeuille « ' + w.name + ' » et toutes ses données ? Cette action est irréversible.')) return;
+    if (prompt('Tapez SUPPRIMER pour confirmer.') !== 'SUPPRIMER') return toast('Suppression annulée.');
+    try { localStorage.removeItem(wKey(w.id)); } catch (e) {}
+    W.list = W.list.filter(x => x.id !== w.id); W.active = 'main'; saveW();
+    const theme = D.settings.theme; D = load(); D.settings.theme = theme;
+    applyTheme(); buildNav(); closeModal(); go('dash'); toast('Portefeuille supprimé.');
+  },
   'bm-prev': () => { state.bilanMonth = shiftMonth(state.bilanMonth, -1); render(); },
   'bm-next': () => { state.bilanMonth = shiftMonth(state.bilanMonth, 1); render(); },
 
@@ -2882,9 +3050,9 @@ const actions = {
     toast(r === 'shared' ? 'Sauvegarde envoyée ✓' : 'Sauvegarde téléchargée. Gardez le fichier en lieu sûr (WhatsApp, Drive…).');
   },
   reset: () => {
-    if (!confirm('Effacer TOUTES les données de Budget Flow ? Cette action est irréversible.')) return;
+    if (!confirm(multiW() ? 'Effacer toutes les données du portefeuille « ' + curWallet().name + ' » ? Les autres portefeuilles ne sont pas touchés. Cette action est irréversible.' : 'Effacer TOUTES les données de Budget Flow ? Cette action est irréversible.')) return;
     if (prompt('Tapez EFFACER pour confirmer.') !== 'EFFACER') return toast('Réinitialisation annulée.');
-    localStorage.removeItem(KEY); D = defaultData(); save(); applyTheme(); go('dash'); toast('Données effacées.');
+    localStorage.removeItem(dataKey()); D = defaultData(); if (curWallet().kind === 'pro') D.categories = PRO_CATS.map(c => ({...c})); save(); applyTheme(); go('dash'); toast('Données effacées.');
   }
 };
 
@@ -2909,7 +3077,7 @@ const live = {
         if (!isActivated() && d._dev !== getLic().dev) return alert(TLL.tr("Pendant l'essai gratuit, seules les sauvegardes faites sur ce téléphone peuvent être restaurées. Activez Budget Flow pour récupérer une sauvegarde d'un autre appareil."));
         delete d._dev;
         if (!confirm('Remplacer les données actuelles par celles de la sauvegarde ?')) return;
-        try { localStorage.setItem(KEY, JSON.stringify(d)); }
+        try { localStorage.setItem(dataKey(), JSON.stringify(d)); }
         catch (e) { return toast('Restauration impossible : la mémoire du téléphone est pleine. Libérez de la place puis réessayez.', 'err'); }
         D = load(); save(); applyTheme(); render(); toast('Sauvegarde restaurée.');
       } catch (e) { toast('Fichier invalide : ce n’est pas une sauvegarde Budget Flow.', 'err'); }
@@ -2949,7 +3117,7 @@ function render() {
   if (!D.settings.mode) { document.body.classList.add('choosing'); $('#view').innerHTML = modeChooser(); window.scrollTo(0, 0); return; }
   document.body.classList.remove('choosing');
   if (!views[state.view]) state.view = 'dash';
-  $('#view').innerHTML = views[state.view]();
+  $('#view').innerHTML = (multiW() && state.view !== 'dash' ? walletBar() : '') + views[state.view]();
   if (!isActivated()) $('#view').insertAdjacentHTML('afterbegin', trialBar());
   document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === state.view));
 }
@@ -2963,6 +3131,7 @@ function applyTheme() {
   const t = D.settings.theme;
   const dark = t === 'dark' || (t === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  document.documentElement.dataset.wallet = curWallet().kind === 'pro' ? 'pro' : 'perso';
 }
 function toast(msg, type = '') {
   const el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg;
@@ -2974,6 +3143,7 @@ function buildNav() {
   $('#brand-logo').innerHTML = icon('flow', 20);
   $('#modal-close').innerHTML = icon('x', 18);
   $('#side-install').innerHTML = installBtn('btn btn-sm btn-block');
+  const sw = $('#side-wallet'); if (sw) sw.innerHTML = `<button class="wpill" style="width:100%;justify-content:flex-start" data-action="wallets"><span>${curWallet().icon}</span><span class="nm">${esc(curWallet().name)}</span><span style="margin-left:auto">▾</span></button>`;
   $('#sidebar-nav').innerHTML = navViews().map(v => `<button class="nav-btn" data-action="go" data-id="${v.id}" data-nav="${v.id}">${icon(v.icon)}<span>${v.label}</span></button>`).join('');
   const bn = (id, ic, l) => `<button class="bn-btn" data-action="go" data-id="${id}" data-nav="${id}">${icon(ic, 22)}<span>${l}</span></button>`;
   $('#bottomnav').innerHTML = bn('dash', 'home', 'Accueil') + bn('journal', 'journal', 'Journal') +
@@ -3010,7 +3180,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#modal'
 window.addEventListener('hashchange', () => { const v = location.hash.slice(1) || 'dash'; if (views[v]) { state.view = v; closeModal(); render(); window.scrollTo(0, 0); } });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
 // Synchronisation si l'appli est ouverte dans deux onglets
-window.addEventListener('storage', e => { if (e.key === KEY) { D = load(); render(); } });
+window.addEventListener('storage', e => { if (e.key === WKEY) { W = loadW(); D = load(); applyTheme(); render(); } else if (e.key === dataKey()) { D = load(); render(); } });
 
 /* =========================================================================
    9. DÉMARRAGE
