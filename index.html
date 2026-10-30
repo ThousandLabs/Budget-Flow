@@ -506,6 +506,7 @@ var TLL=(function(){
 
 /* Dictionnaire français → anglais */
 var TLL_EN={
+"Pendant l'essai gratuit, seules les sauvegardes faites sur ce téléphone peuvent être restaurées. Activez Budget Flow pour récupérer une sauvegarde d'un autre appareil.":"During the free trial, only backups made on this phone can be restored. Activate Budget Flow to restore a backup from another device.",
 "Essai gratuit : il reste {}": "Free trial: {} left",
 "Essai gratuit en cours : il reste {}": "Free trial running: {} left",
 "← Continuer l'essai gratuit": "← Continue the free trial",
@@ -667,7 +668,7 @@ var TLL_EN={
 "Vise le QR code…": "Aim at the QR code…",
 "📵 Caméra non disponible ici. Ouvre l'appli installée (site en https).": "📵 Camera not available here. Open the installed app (https site).",
 "📵 Caméra non disponible ici. Ouvre l’appli installée (site en https).": "📵 Camera not available here. Open the installed app (https site).",
-"📵 Accès à la caméra refusé. Autorise-le dans les réglages du navigateur.": "📵 Camera access denied. Allow it in your browser settings.",
+"📵 Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.": "📵 Camera access denied. Allow it in your browser settings.",
 "❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilise le message ou le fichier.": "❌ QR scanner unavailable offline on this phone. Use the message or the file.",
 "Contacter le support": "Contact support",
 "Thousand Labs": "Thousand Labs",
@@ -1701,7 +1702,7 @@ function loadJsQR(){return new Promise((ok,ko)=>{if(window.jsQR)return ok();cons
 async function startScan(video,status,onText){
   stopScan();
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){status.textContent='📵 Caméra non disponible ici. Ouvre l\'appli installée (site en https).';return}
-  try{scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false})}catch(e){status.textContent='📵 Accès à la caméra refusé. Autorise-le dans les réglages du navigateur.';return}
+  try{scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false})}catch(e){status.textContent='📵 Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.';return}
   video.setAttribute('playsinline','');video.muted=true;video.srcObject=scanStream;try{await video.play()}catch(e){}
   let detect=null;
   if('BarcodeDetector' in window){try{const bd=new BarcodeDetector({formats:['qr_code']});detect=async()=>{const r=await bd.detect(video);return r.length?r[0].rawValue:null}}catch(e){detect=null}}
@@ -2891,7 +2892,7 @@ const actions = {
 
   // Sauvegarde
   export: async () => {
-    const r = await shareOrDownload(`budget-flow-sauvegarde-${today()}.json`, JSON.stringify(D, null, 2));
+    const r = await shareOrDownload(`budget-flow-sauvegarde-${today()}.json`, JSON.stringify(Object.assign({}, D, {_dev: getLic().dev}), null, 2));
     if (r === 'cancel') return toast('Sauvegarde annulée.', 'warn');
     D.settings.lastBackup = today(); save(); render();
     toast(r === 'shared' ? 'Sauvegarde envoyée ✓' : 'Sauvegarde téléchargée. Gardez le fichier en lieu sûr (WhatsApp, Drive…).');
@@ -2920,6 +2921,9 @@ const live = {
       try {
         const d = JSON.parse(r.result);
         if (!d || !Array.isArray(d.categories) || !Array.isArray(d.expenses)) throw new Error('format');
+        // Essai gratuit : pas de sauvegarde venant d'un autre appareil (sinon on pourrait enchaîner les essais)
+        if (!isActivated() && d._dev !== getLic().dev) return alert(TLL.tr("Pendant l'essai gratuit, seules les sauvegardes faites sur ce téléphone peuvent être restaurées. Activez Budget Flow pour récupérer une sauvegarde d'un autre appareil."));
+        delete d._dev;
         if (!confirm('Remplacer les données actuelles par celles de la sauvegarde ?')) return;
         try { localStorage.setItem(KEY, JSON.stringify(d)); }
         catch (e) { return toast('Restauration impossible : la mémoire du téléphone est pleine. Libérez de la place puis réessayez.', 'err'); }
