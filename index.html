@@ -1571,21 +1571,7 @@ const CONTACT = '221711216581', CONTACT_FMT = '71\u00a0121\u00a065\u00a081';
 const PRICE = '10\u00a0000\u00a0F';
 const LIC_KEY = 'budgetflow_licence';
 const ALPHA = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-// Clé interne (doit être IDENTIQUE dans le générateur)
-const _k = () => [84,76,45,66,70,45,50,48,50,54,45,120,81,55,109,90].map(c => String.fromCharCode(c)).join('') + '-flow';
-function cyrb53(str, seed = 0) {
-  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-  for (let i = 0; i < str.length; i++) { const ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
-  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-}
-const toAlpha = (n, len) => { let out = ''; for (let i = 0; i < len; i++) { out += ALPHA[n % ALPHA.length]; n = Math.floor(n / ALPHA.length); } return out; };
 const cleanCode = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-function activationCode(dev) {
-  const d = cleanCode(dev), k = _k();
-  return (toAlpha(cyrb53(d + '|' + k, 7), 6) + toAlpha(cyrb53(k + '#' + d, 13), 6)).match(/.{4}/g).join('-');
-}
 function getLic() {
   let lic = {};
   try { lic = JSON.parse(localStorage.getItem(LIC_KEY)) || {}; } catch (e) {}
@@ -1597,11 +1583,9 @@ function getLic() {
   return lic;
 }
 // Activation v2 : SIGNATURE NUMÉRIQUE (l'appli ne contient que la clé publique ; codes générés par Thousand Admin).
-// Les appareils déjà activés avec l'ancien code restent valides.
 const BF_PUB = {"kty": "EC", "crv": "P-256", "x": "pcF7mT3FVUz-KyYrnAS_KaplrCOu1NVeIPZrFN8MfiM", "y": "PCDYshME04Lczd0f_C6neNBZR0G7Canh4ROT-7hjhCs"};
 let LIC_SIG_OK = false;
-const legacyOk = l => !!l.code && cleanCode(l.code) === cleanCode(activationCode(l.dev));
-const isActivated = () => legacyOk(getLic()) || LIC_SIG_OK;
+const isActivated = () => LIC_SIG_OK;
 const sigOf = s => String(s || '').replace(/\s+/g, '').replace(/^BFCODE:/i, '');
 function unb64u(t){t=String(t).replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const s=atob(t);const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
 async function checkSig(sig) {
@@ -3035,7 +3019,7 @@ window.addEventListener('storage', e => { if (e.key === KEY) { D = load(); rende
   const v = location.hash.slice(1);
   state.view = views[v] ? v : 'dash';
   const l = getLic();
-  if (!legacyOk(l) && l.sig) LIC_SIG_OK = await checkSig(l.sig);
+  if (l.sig) LIC_SIG_OK = await checkSig(l.sig);
   buildNav(); applyTheme(); render();
   if (!isActivated() && trialInfo().active) { trialTouch(); trialTimer = setInterval(trialTick, 30000); }
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
