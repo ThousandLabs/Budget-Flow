@@ -1612,7 +1612,7 @@ const PRO_CATS = [
   ['Impôts, taxes & frais','variable','🧾'], ['Frais Wave / Orange Money','variable','💸'], ['Imprévus','variable','⚠️']
 ].map(([name, kind, ic], i) => ({id: 'p' + i, name, kind, icon: ic, budget: 0}));
 function loadW() {
-  let w = null; try { w = JSON.parse(localStorage.getItem(WKEY)); } catch (e) {}
+  let w = null; try { w = cleanData(JSON.parse(localStorage.getItem(WKEY))); } catch (e) {}
   if (!w || !Array.isArray(w.list) || !w.list.length) w = {active: 'main', list: [{id: 'main', name: 'Personnel', icon: '👤', kind: 'perso'}]};
   if (!w.list.some(x => x.id === w.active)) w.active = w.list[0].id;
   return w;
@@ -1627,7 +1627,7 @@ function load() {
   try {
     const raw = localStorage.getItem(dataKey());
     if (raw) {
-      const d = Object.assign(defaultData(), JSON.parse(raw));
+      const d = Object.assign(defaultData(), cleanData(JSON.parse(raw)));
       const base = defaultData().settings;
       d.settings = Object.assign(base, d.settings);
       d.settings.caps = Object.assign({day: 0, week: 0, month: 0}, d.settings.caps);
@@ -1657,9 +1657,20 @@ const PRICE = '10\u00a0000\u00a0F';
 const LIC_KEY = 'budgetflow_licence';
 const ALPHA = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const cleanCode = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+/* ---------- 🛡️ Nettoyage des données entrantes (sauvegarde, synchro, import, démarrage) ----------
+   Les champs techniques (identifiants, dates, moyens de paiement, devise…) ne gardent que des caractères
+   inoffensifs ; dans les textes libres, < > " ` sont remplacés par des signes équivalents.
+   Ainsi, un fichier ou une synchro piégés ne peuvent jamais exécuter de code dans l'appli. */
+function cleanData(o){
+  const T=/^(id|[a-z]*Id|by|date|[a-z]*Date|day|month|method|currency|kind|type|status|cat|category|unit|mode|role|period|freq|dev|ws)$/;
+  const R={'<':'‹','>':'›','"':'”','`':'ʼ'};
+  const s=(k,v)=>T.test(k)?v.replace(/[^\p{L}\p{N}\s_.:,+\-\/€$£¥%#@]/gu,''):v.replace(/[<>"`]/g,c=>R[c]);
+  const w=(v,k)=>typeof v==='string'?s(k,v):Array.isArray(v)?v.map(x=>w(x,k)):(v&&typeof v==='object')?Object.fromEntries(Object.entries(v).filter(([kk])=>!/[<>"`]/.test(kk)).map(([kk,x])=>[kk,w(x,kk)])):v;
+  try{return w(o,'')}catch(e){return o}}
 function getLic() {
   let lic = {};
-  try { lic = JSON.parse(localStorage.getItem(LIC_KEY)) || {}; } catch (e) {}
+  try { lic = cleanData(JSON.parse(localStorage.getItem(LIC_KEY))) || {}; } catch (e) {}
   if (!lic.dev) {
     const rnd = () => { let x = ''; for (let i = 0; i < 4; i++) x += ALPHA[Math.floor(Math.random() * ALPHA.length)]; return x; };
     lic = {dev: `BF-${rnd()}-${rnd()}`};
@@ -1772,7 +1783,7 @@ const QR=(()=>{
 
 /* Lecteur : BarcodeDetector (Android/Chrome) sinon jsQR chargé à la demande (puis gardé hors ligne) */
 let scanStream=null,scanTimer=null;
-function loadJsQR(){return new Promise((ok,ko)=>{if(window.jsQR)return ok();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';s.onload=()=>window.jsQR?ok():ko();s.onerror=ko;document.head.appendChild(s)})}
+function loadJsQR(){return new Promise((ok,ko)=>{if(window.jsQR)return ok();const s=document.createElement('script');s.src='./jsQR.js';/* jsQR 1.4.0 (github.com/cozmo/jsQR), hébergé avec l'appli : aucun script externe */s.onload=()=>window.jsQR?ok():ko();s.onerror=ko;document.head.appendChild(s)})}
 async function startScan(video,status,onText){
   stopScan();
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){status.textContent='📵 Caméra non disponible ici. Ouvre l\'appli installée (site en https).';return}
@@ -3178,7 +3189,7 @@ const live = {
     const r = new FileReader();
     r.onload = () => {
       try {
-        const d = JSON.parse(r.result);
+        const d = cleanData(JSON.parse(r.result));
         if (!d || !Array.isArray(d.categories) || !Array.isArray(d.expenses)) throw new Error('format');
         // Essai gratuit : pas de sauvegarde venant d'un autre appareil (sinon on pourrait enchaîner les essais)
         if (!isActivated() && d._dev !== getLic().dev) return alert(TLL.tr("Pendant l'essai gratuit, seules les sauvegardes faites sur ce téléphone peuvent être restaurées. Activez Budget Flow pour récupérer une sauvegarde d'un autre appareil."));
