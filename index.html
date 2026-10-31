@@ -1668,7 +1668,11 @@ function getLic() {
   return lic;
 }
 // Activation v2 : SIGNATURE NUMÉRIQUE (l'appli ne contient que la clé publique ; codes générés par Thousand Admin).
-const BF_PUB = {"kty": "EC", "crv": "P-256", "x": "pcF7mT3FVUz-KyYrnAS_KaplrCOu1NVeIPZrFN8MfiM", "y": "PCDYshME04Lczd0f_C6neNBZR0G7Canh4ROT-7hjhCs"};
+const BF_PUB = {"kty":"EC","crv":"P-256","x":"RVmjz3pvJuUWH1lmkzXeVf55zMDiGSrFi2QknF_YE34","y":"oeHbjw8z07nwufMqfT-0P25PUCTElUkLxDbIFTm1x_0"};
+  /* Codes déjà donnés avec l'ancienne clé (retirée) : seuls ces codes exacts restent valables. */
+const LEGACY_CODES=["da5009a927d524cae80e2e497dd01e4bdcc83c0b77e484b45d9a4a4745cd2097", "24fd0c572e46f53fc008d10aeccf1bf77dd9a8340b4463854aadf4a1229c2827"];
+async function legacyOk(id,c){try{if(!LEGACY_CODES.length)return false;const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(id+':'+c));const h=Array.from(new Uint8Array(d),b=>b.toString(16).padStart(2,'0')).join('');return LEGACY_CODES.includes(h)}catch(e){return false}}
+
 let LIC_SIG_OK = false;
 const isActivated = () => LIC_SIG_OK;
 const sigOf = s => String(s || '').replace(/\s+/g, '').replace(/^BFCODE:/i, '');
@@ -1676,6 +1680,7 @@ function unb64u(t){t=String(t).replace(/-/g,'+').replace(/_/g,'/');while(t.lengt
 async function checkSig(sig) {
   try {
     const c = sigOf(sig); if (!c || !(window.crypto && crypto.subtle)) return false;
+      if (await legacyOk(getLic().dev, c)) return true;
     const k = await crypto.subtle.importKey('jwk', BF_PUB, {name: 'ECDSA', namedCurve: 'P-256'}, false, ['verify']);
     return await crypto.subtle.verify({name: 'ECDSA', hash: 'SHA-256'}, k, unb64u(c), new TextEncoder().encode(getLic().dev));
   } catch (e) { return false; }
