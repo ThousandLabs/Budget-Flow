@@ -7,9 +7,9 @@
 <meta name="description" content="Budget Flow — gestion financière personnelle et suivi de petits projets, 100 % local.">
 <title>Budget Flow</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png?v=tl2">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=tl2">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=tl2">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -75,7 +75,7 @@ b,strong{font-weight:700}
 .app{display:flex;min-height:100vh}
 .sidebar{display:none;position:sticky;top:0;height:100vh;width:250px;flex-shrink:0;flex-direction:column;gap:3px;padding:20px 14px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;padding:4px 10px 20px;letter-spacing:-.02em}
-.brand-logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#0f766e,#0ea5e9);display:grid;place-items:center;color:#fff}
+.brand-logo{width:36px;height:36px;border-radius:11px;background:#16233F;display:grid;place-items:center;color:#fff}
 .nav-btn{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;color:var(--muted);font-weight:600;font-size:14px;text-align:left;width:100%;transition:background .15s,color .15s}
 .nav-btn:hover{background:var(--surface2);color:var(--text)}
 .nav-btn.active{background:var(--primary-soft);color:var(--primary)}
@@ -1540,6 +1540,7 @@ const weekStart = () => { const d = new Date(); d.setDate(d.getDate() - (d.getDa
 const byDateDesc = (a, b) => b.date.localeCompare(a.date) || (b.ts || 0) - (a.ts || 0);
 
 /* --- Icônes SVG (traits, style « lucide ») --- */
+const BRANDMARK = '<svg viewBox="14 14 72 72" width="26" height="26" aria-hidden="true"><path d="M25 33l33-12 6 12" fill="none" stroke="#3FD1B0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="33" width="62" height="45" rx="10" fill="none" stroke="#3FD1B0" stroke-width="6"/><path d="M81 47H66a8.5 8.5 0 0 0 0 17h15" fill="none" stroke="#3FD1B0" stroke-width="6" stroke-linejoin="round"/><circle cx="67" cy="55.5" r="4.8" fill="#F2B33D"/></svg>';
 const ICONS = {
   home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   in:'<path d="M17 7 7 17M7 8v9h9"/>',
@@ -1930,7 +1931,7 @@ function renderLock(err = '') {
       : `<div class="trial-box"><b>🎁 Essayez gratuitement pendant 48 h</b><span class="hint">Accès complet, sans paiement ni engagement. Ensuite, un code d'activation sera demandé ; vos données seront conservées.</span><button type="button" class="btn btn-primary btn-block" data-action="trial-start">Commencer l'essai gratuit</button></div>`;
   const msg = `Bonjour, je souhaite obtenir Budget Flow (${PRICE}). Mon code appareil : ${lic.dev}`;
   $('#lock').innerHTML = `<div class="lock-wrap"><div class="lock-card ${err ? 'shake' : ''}">
-    <div><div class="brand" style="padding:0 0 4px"><div class="brand-logo">${icon('flow', 20)}</div>Budget Flow</div><p class="hint">par ${TEAM}</p></div>
+    <div><div class="brand" style="padding:0 0 4px"><div class="brand-logo">${BRANDMARK}</div>Budget Flow</div><p class="hint">par ${TEAM}</p></div>
     <div><h1 class="lock-title">Activez votre application</h1><p class="sub mt-s">Budget Flow fonctionne avec un code d'accès personnel, lié à cet appareil.</p>${TLL.switcher()}</div>
     ${trialHtml}
     <div class="steps">
@@ -3244,7 +3245,7 @@ function modeChooser(inSettings = false) {
     'Pour ceux qui veulent piloter leur budget en détail.');
   return inSettings ? `<div class="mode-grid">${simple}${full}</div>` : `
   <div class="mode-wrap">
-    <div class="brand" style="padding:0 0 6px"><div class="brand-logo">${icon('flow', 20)}</div>Budget Flow</div>
+    <div class="brand" style="padding:0 0 6px"><div class="brand-logo">${BRANDMARK}</div>Budget Flow</div>
     <h1>Comment voulez-vous utiliser Budget Flow ?</h1>
     <p class="sub mt-s">Choisissez la version qui vous convient. Vous pourrez changer à tout moment dans les <b>Réglages</b>, sans perdre aucune donnée.</p>
     <div class="mode-grid mt">${simple}${full}</div>
@@ -3278,7 +3279,7 @@ function toast(msg, type = '') {
   setTimeout(() => { el.style.transition = 'opacity .3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2800);
 }
 function buildNav() {
-  $('#brand-logo').innerHTML = icon('flow', 20);
+  $('#brand-logo').innerHTML = BRANDMARK;
   $('#modal-close').innerHTML = icon('x', 18);
   $('#side-install').innerHTML = installBtn('btn btn-sm btn-block');
   const sw = $('#side-wallet'); if (sw) sw.innerHTML = `<button class="wpill" style="width:100%;justify-content:flex-start" data-action="wallets"><span>${curWallet().icon}</span><span class="nm">${esc(curWallet().name)}</span><span style="margin-left:auto">▾</span></button>`;
