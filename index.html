@@ -733,6 +733,8 @@ var TLL_EN={
 "❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilise le message ou le fichier.": "❌ QR scanner unavailable offline on this phone. Use the message or the file.",
 "Contacter le support": "Contact support",
 "Thousand Labs": "Thousand Labs",
+"Une appli de": "An app by",
+"Découvrir nos autres applis": "Discover our other apps",
 "Activée ✅": "Activated ✅",
 "Zone sensible": "Danger zone",
 "Ton navigateur peut installer": "Your browser can install",
@@ -1784,6 +1786,8 @@ function stopScan(){clearInterval(scanTimer);scanTimer=null;if(scanStream){scanS
 
 const waLink = text => `https://wa.me/${CONTACT}?text=${encodeURIComponent(text)}`;
 
+/* ---------- Thousand Labs : signature avec logo (écran d'activation + licence) ---------- */
+function tlBrand(big){var s=big?40:28;return '<div class="tlbrand" style="display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0 4px"><svg width="'+s+'" height="'+s+'" viewBox="0 -2 120 120" aria-hidden="true" style="flex-shrink:0"><path d="M20 102 V22 L60 72 L100 22 V102" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="60" cy="44" r="7" fill="#E8A317"/><circle cx="70" cy="27" r="4.5" fill="#E8A317"/></svg><span style="line-height:1.15;text-align:left"><span style="display:block;font-size:12px;opacity:.75">Une appli de</span><b style="letter-spacing:1.5px">THOUSAND LABS</b></span></div>'+(big?'<p style="text-align:center;margin:4px 0 0;font-size:14px"><a href="https://thousandlabs.github.io/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Découvrir nos autres applis</a></p>':'')}
 function renderLock(err = '') {
   const lic = getLic(), ti = trialInfo();
   document.body.classList.add('locked');
@@ -1812,6 +1816,7 @@ function renderLock(err = '') {
     </form>
     ${isStandalone() ? '' : `<div class="flex" style="justify-content:center">${installBtn('btn btn-sm')}</div>`}
     <div style="text-align:center"><button class="link-btn" data-action="lock-guide">Découvrir l'application et le guide</button></div>
+    ${tlBrand(0)}
     <div class="lock-foot">${PRICE} · paiement unique · WhatsApp ${CONTACT_FMT}</div>
   </div></div>`;
 }
@@ -2718,6 +2723,7 @@ views.reglages = () => {
         <div class="kv"><span>Éditeur</span><b>${TEAM}</b></div>
         <div class="kv"><span>Assistance</span><a class="link-btn" href="${waLink('Bonjour, j’ai besoin d’aide avec Budget Flow.')}" target="_blank" rel="noopener">WhatsApp ${CONTACT_FMT}</a></div>
       </div>
+      ${tlBrand(1)}
     </div>
   </div>`;
 };
