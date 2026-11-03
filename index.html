@@ -150,7 +150,7 @@ main{flex:1;min-width:0}
 .list{display:flex;flex-direction:column}
 .item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
 .item:last-child{border-bottom:0}
-.item-ic{width:40px;height:40px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;font-size:14px;font-weight:700;color:var(--muted,inherit);flex-shrink:0}
+.item-ic{width:40px;height:40px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;font-size:18px;flex-shrink:0}
 .item-main{flex:1;min-width:0}
 .item-title{font-weight:650;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item-sub{font-size:12.5px;color:var(--muted)}
@@ -220,7 +220,7 @@ main{flex:1;min-width:0}
 .wlist{display:flex;flex-direction:column;gap:8px}
 .witem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--text);font:inherit}
 .witem.on{border-color:var(--primary);background:var(--primary-soft)}
-.witem .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--surface);border:1px solid var(--border);flex:none}.witem .gr{flex:1;min-width:0}.witem b{display:block}.witem small{color:var(--muted);font-size:12.5px}
+.witem .ic{font-size:24px;flex:none}.witem .gr{flex:1;min-width:0}.witem b{display:block}.witem small{color:var(--muted);font-size:12.5px}
 .seg2{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .seg2 button{height:34px;padding:0 12px;font-weight:700;font-size:13px;background:var(--surface2);color:var(--muted);border:0;cursor:pointer}
 .seg2 button.on{background:var(--primary);color:#fff}
@@ -324,6 +324,169 @@ body.choosing .sidebar,body.choosing .bottomnav{display:none}
 .mode-list{margin:10px 0 0;padding-left:18px;font-size:14px;line-height:1.5}
 .mode-list li{margin:3px 0}
 </style>
+
+<style>/* Icônes au trait (remplacent les emojis à l'affichage) */.eic{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-right:.4em;flex:none}.eic.solo{margin:0;width:1.2em;height:1.2em;vertical-align:middle}.eic-ok{color:#16a34a}.eic-ko{color:#dc2626}.eic-wa{color:#c98500}.eic-fire{color:#e8590c}.eic-wave{color:#1ba6e8}.eic-om{color:#ff7900}</style>
+<script>
+/* =====================================================================
+   Icônes : les emojis de l'interface sont remplacés à l'affichage par des
+   icônes vectorielles au trait (même module que ScoreUp). Les emojis non
+   répertoriés sont simplement retirés.
+   ===================================================================== */
+var ICO=(function(){
+  var P={
+    check:'<circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>',
+    x:'<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>',
+    half:'<circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>',
+    alert:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+    edit:'<path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/>',
+    cap:'<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>',
+    file:'<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+    save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
+    swords:'<path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M14.5 6.5 18 3h3v3l-3.5 3.5M5 14l4 4M7 17l-3 3M3 19l2 2"/>',
+    menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+    book:'<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+    cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>',
+    gear:'<path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+    users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+    chat:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>',
+    clip:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
+    spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15.5l.8 1.7 1.7.8-1.7.8-.8 1.7-.8-1.7-1.7-.8 1.7-.8z"/>',
+    search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/>',
+    moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>',
+    target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+    gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+    cart:'<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2 2h2l2.7 12.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L22 7H5.1"/>',
+    phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+    laptop:'<path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.3 2.6a1 1 0 0 1-.9 1.4H3.6a1 1 0 0 1-.9-1.4L4 16"/>',
+    star:'<path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>',
+    starf:'<path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z" fill="currentColor"/>',
+    chart:'<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>',
+    repeat:'<path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.9 1 6.7 2.7L21 8"/><path d="M21 3v5h-5"/>',
+    timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M10 2h4"/>',
+    lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0z"/>',
+    flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+    home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+    history:'<path d="M3 12a9 9 0 1 0 9-9 9.8 9.8 0 0 0-6.7 2.7L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/>',
+    panel:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15h18"/>',
+    down:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+    up:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
+    contrast:'<circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12z" fill="currentColor"/>',
+    key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>',
+    qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h7v-4"/>',
+    scale:'<path d="M12 3v18M7 21h10M4 7h16M6 7l-3 7a3 3 0 0 0 6 0zM18 7l-3 7a3 3 0 0 0 6 0z"/>',
+    info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+    wallet:'<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+    cash:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>',
+    camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/>',
+    landmark:'<path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 2l8 5H4z"/><path d="M4 18h16"/>',
+    nocam:'<path d="M2 2l20 20M7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16M9.5 4h5L17 7h3a2 2 0 0 1 2 2v7.3M14.1 14.1A3 3 0 1 1 9.9 9.9"/>',
+    cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9z"/>',
+    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+    link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+    signal:'<path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/>',
+    wifioff:'<path d="M2 2l20 20M8.5 16.4a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 4.2-2.6M10.7 5.1A15 15 0 0 1 22 8.8M5 12.9a10 10 0 0 1 5.2-2.8M16.9 10.6A10 10 0 0 1 19 12.9M12 20h.01"/>',
+    wifi:'<path d="M5 12.6a10 10 0 0 1 14 0M8.5 16.4a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/>',
+    bulb:'<path d="M15 14c.2-1 .7-1.7 1.5-2.5A6 6 0 1 0 6 8c0 1.5.6 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5M9 18h6M10 22h4"/>',
+    attach:'<path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/>',
+    coins:'<circle cx="8" cy="8" r="6"/><path d="M18.1 10.4A6 6 0 1 1 10.3 18M7 6h1v4M16.7 13.9l.7.7-2.8 2.8"/>',
+    trend:'<path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>',
+    trenddown:'<path d="M22 17l-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/>',
+    receipt:'<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M16 8H8M16 12H8M13 16H8"/>',
+    card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+    pin:'<path d="M12 17v5M9 10.8a2 2 0 0 1-1.1 1.8l-1.8.9A2 2 0 0 0 5 15.2V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.8a2 2 0 0 0-1.1-1.7l-1.8-.9a2 2 0 0 1-1.1-1.8V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
+    mappin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+    stop:'<rect x="5" y="5" width="14" height="14" rx="2"/>',
+    pause:'<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
+    play:'<path d="M6 3l14 9-14 9z"/>',
+    briefcase:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+    box:'<path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/>',
+    folder:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/>',
+    shield:'<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.7 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/>',
+    trash:'<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/>',
+    pie:'<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>',
+    store:'<path d="M3 9l1.5-5h15L21 9M3 9v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9M3 9h18M9 21v-6h6v6"/>',
+    compass:'<circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.1 6.4-6.4 2.1 2.1-6.4z"/>',
+    help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
+    tool:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/>',
+    zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+    drop:'<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5S5 13 5 15a7 7 0 0 0 7 7z"/>',
+    food:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>',
+    bus:'<rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16M8 19v2M16 19v2M8 15h.01M16 15h.01"/>',
+    pill:'<path d="m10.5 20.5 10-10a4.9 4.9 0 1 0-7-7l-10 10a4.9 4.9 0 1 0 7 7zM8.5 8.5l7 7"/>',
+    truck:'<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.6a1 1 0 0 0-.2-.6l-3.5-4.4A1 1 0 0 0 17.5 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+    megaphone:'<path d="m3 11 18-5v12L3 14v-3zM11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+    bag:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>',
+    arrup:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+    arrdown:'<path d="M12 5v14M19 12l-7 7-7-7"/>',
+    leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10z"/><path d="M2 21c0-3 1.9-5.4 5.1-6"/>',
+    image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',
+    snow:'<path d="M2 12h20M12 2v20M20 16l-4-4 4-4M4 8l4 4-4 4M16 4l-4 4-4-4M8 20l4-4 4 4"/>',
+    cup:'<path d="M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4zM6 2v2M10 2v2M14 2v2"/>',
+    fan:'<path d="M10.8 10.7c-.4-3.3-.9-6.5 1.4-7.6 3.1-1.4 5 3.1 1.6 6.3M13.3 10.8c3.3-.4 6.5-.9 7.6 1.4 1.4 3.1-3.1 5-6.3 1.6M13.2 13.3c.4 3.3.9 6.5-1.4 7.6-3.1 1.4-5-3.1-1.6-6.3M10.7 13.2c-3.3.4-6.5.9-7.6-1.4-1.4-3.1 3.1-5 6.3-1.6"/><circle cx="12" cy="12" r="1.5"/>',
+    battery:'<rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2M6 11v2"/>',
+    tv:'<rect x="2" y="7" width="20" height="15" rx="2"/><path d="m17 2-5 5-5-5"/>',
+    gamepad:'<path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="4"/>',
+    speaker:'<path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>',
+    monitor:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+    printer:'<path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
+    plug:'<path d="M12 22v-5M9 8V2M15 8V2M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8z"/>',
+    shirt:'<path d="M20.4 3.5 16 2a4 4 0 0 1-8 0L3.6 3.5a2 2 0 0 0-1.3 2.2l.6 3.5a1 1 0 0 0 1 .8H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.2a1 1 0 0 0 1-.8l.6-3.5a2 2 0 0 0-1.4-2.2z"/>',
+    washer:'<rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M7 6h.01M10 6h.01"/>',
+    wind:'<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2M9.6 4.6A2 2 0 1 1 11 8H2M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+    video:'<path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+    thermo:'<path d="M14 4v10.5a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"/>',
+    ban:'<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+    calc:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M16 14v4M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/>',
+    tag:'<path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="1"/>',
+    hash:'<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',
+    swap:'<path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>',
+    bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
+    undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+    redo:'<path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
+    dot:'<circle cx="12" cy="12" r="4"/>'
+  };
+  /* emoji → [icône, couleur] ; null = emoji décoratif retiré */
+  var M={"✅":["check","ok"],"❌":["x","ko"],"🟡":["half","wa"],"⚠️":["alert","wa"],"⚠":["alert","wa"],"✏️":["edit"],"✏":["edit"],"🛠️":["edit"],"🛠":["edit"],
+    "🎓":["cap"],"📝":["file"],"💾":["save"],"⚔️":["swords"],"⚔":["swords"],"☰":["menu"],"➕":["plus"],"🌍":["globe"],"🌐":["globe"],
+    "📚":["book"],"📖":["book"],"📘":["book"],"📅":["cal"],"⚙️":["gear"],"⚙":["gear"],"🤝":["users"],"💬":["chat"],"📋":["clip"],"🤖":["spark"],
+    "🔍":["search"],"☀️":["sun"],"☀":["sun"],"🌙":["moon"],"🎯":["target"],"🎁":["gift"],"🛒":["cart"],"📲":["phone"],"📱":["phone"],"🍏":["phone"],
+    "💻":["laptop"],"☆":["star"],"★":["starf"],"⭐":["star"],"📊":["chart"],"🔁":["repeat"],"⏱️":["timer"],"⏱":["timer"],"⏰":["timer"],"⌛":["timer"],
+    "🔒":["lock"],"🏆":["trophy","wa"],"🔥":["flame","fire"],"🏠":["home"],"🕘":["history"],"👍":["panel"],"📥":["down"],"📤":["up"],"🎨":["contrast"],
+    "🔑":["key"],"🔳":["qr"],"⚖️":["scale"],"⚖":["scale"],"ℹ️":["info"],"ℹ":["info"],"🌊":["wallet","wave"],"🟠":["wallet","om"],"💵":["cash","ok"],
+    "📷":["camera"],"🏛️":["landmark"],"🏛":["landmark"],"📵":["nocam","ko"],
+    "🇫🇷":null,"🇬🇧":null,"👋":null,"💪":null,"🚀":null,"😅":null,"🆕":null,
+    "⏳":["timer"],"☁":["cloud"],"🙋":["user"],"🔄":["repeat"],"🔗":["link"],"🙌":null,"📶":["signal"],"📴":["wifioff","wa"],"💡":["bulb","wa"],"📎":["attach"],"✨":["spark"],"🎉":null,"💰":["coins"],"📉":["trenddown"],"🧾":["receipt"],"💳":["card"],"👥":["users"],"📌":["pin"],"⏹":["stop"],"🕓":["history"],"💼":["briefcase"],"🗓":["cal"],"📦":["box"],"📂":["folder"],"♻":["repeat"],"⏸":["pause"],"▶":["play"],"🙏":null,"🛡":["shield"],"📈":["trend"],"🔎":["search"],"🗑":["trash"],"💸":["cash"],"🍩":["pie"],"🏪":["store"],"👤":["user"],"🧭":["compass"],"❓":["help"],"🧰":["tool"],"⚡":["zap"],"💧":["drop"],"🍽":["food"],"🚌":["bus"],"💊":["pill"],"🧴":["drop"],"🏬":["store"],"🚚":["truck"],"📣":["megaphone"],"🛍":["bag"],"⬆":["arrup"],"⬇":["arrdown"],"🌱":["leaf"],"🔦":["bulb"],"🖼":["image"],"❄":["snow"],"🧊":["snow"],"🥤":["cup"],"🚰":["drop"],"🌀":["fan"],"🔋":["battery"],"📺":["tv"],"📡":["signal"],"🛜":["wifi"],"🎮":["gamepad"],"🔊":["speaker"],"🖥":["monitor"],"🖨":["printer"],"🔌":["plug"],"👔":["shirt"],"🧺":["washer"],"🧵":["tool"],"💨":["wind"],"🚿":["drop"],"☕":["cup"],"🍲":["food"],"🍳":["food"],"🍚":["food"],"📹":["video"],"🔧":["tool"],"👨‍👩‍👦":["users"],"🧳":["briefcase"],"🥵":["thermo"],"🚫":["ban","ko"],"🤔":["help"],"🧮":["calc"],"🕵":["search"],"📆":["cal"],"📍":["mappin"],"✍":["edit"],"🏷":["tag"],"🔮":["spark"],"🧠":["spark"],"🔢":["hash"],"🅰":null,"🅱":null,"🚨":["alert","ko"],"↔":["swap"],"🔔":["bell"],"🗂":["folder"],"↩":["undo"],"↪":["redo"]};
+  function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+  var K=Object.keys(M).sort(function(a,b){return b.length-a.length});
+  var RE=new RegExp('('+K.map(esc).join('|')+'|(?:[\\p{Extended_Pictographic}\\p{Regional_Indicator}][\\uFE0F\\u200D\\u20E3]*)+)\\uFE0F? ?','gu');
+  function svg(d){return '<svg class="eic'+(d[1]?' eic-'+d[1]:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+P[d[0]]+'</svg>'}
+  var SK={SCRIPT:1,STYLE:1,TEXTAREA:1,PRE:1},PL={TITLE:1,OPTION:1};
+  function conv(t){var v=t.nodeValue,p=t.parentNode;if(!v||!p||p.nodeType!==1)return;RE.lastIndex=0;if(!RE.test(v))return;
+    for(var e=p;e&&e.nodeType===1;e=e.parentNode){if(SK[e.nodeName]||e.namespaceURI==='http://www.w3.org/2000/svg'||(e.hasAttribute&&e.hasAttribute('data-noic')))return}
+    if(PL[p.nodeName]){RE.lastIndex=0;t.nodeValue=v.replace(RE,'');return}
+    var solo=!v.replace(RE,'').trim()&&p.childNodes.length===1;
+    var f=document.createDocumentFragment(),last=0,tmp=document.createElement('span');RE.lastIndex=0;
+    v.replace(RE,function(m,k,off){if(off>last)f.appendChild(document.createTextNode(v.slice(last,off)));var d=M[k.replace(/\uFE0F/g,'')];if(d===undefined)d=M[k];if(d){tmp.innerHTML=svg(d);var g=tmp.firstChild;if(solo)g.setAttribute('class',g.getAttribute('class')+' solo');f.appendChild(g)}last=off+m.length;return m});
+    if(last<v.length)f.appendChild(document.createTextNode(v.slice(last)));
+    p.replaceChild(f,t)}
+  var AT=['placeholder','title','aria-label'];function attrs(el){if(!el.querySelectorAll)return;var L=[el].concat([].slice.call(el.querySelectorAll('[placeholder],[title],[aria-label]')));L.forEach(function(x){AT.forEach(function(a){var v=x.getAttribute&&x.getAttribute(a);if(v){RE.lastIndex=0;if(RE.test(v)){RE.lastIndex=0;x.setAttribute(a,v.replace(RE,'').trim())}}})})}
+  function walk(root){if(root&&root.nodeType===1)attrs(root);if(!root)return;if(root.nodeType===3){conv(root);return}if(root.nodeType!==1&&root.nodeType!==11)return;
+    var it=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),n,L=[];while((n=it.nextNode()))L.push(n);L.forEach(conv)}
+  function init(){walk(document.body);try{new MutationObserver(function(list){for(var i=0;i<list.length;i++){var m=list[i];
+      if(m.type==='childList')for(var j=0;j<m.addedNodes.length;j++)walk(m.addedNodes[j]);else if(m.type==='characterData')conv(m.target)}})
+    .observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}}
+  /* Les fenêtres système (alert, confirm, prompt) ne savent pas afficher d'icône : on y retire les emojis */
+  function strip(s){return s==null?s:String(s).replace(RE,'')}
+  ['alert','confirm'].forEach(function(f){var o=window[f];if(o)window[f]=function(m){return o.call(window,strip(m))}});
+  var pr=window.prompt;if(pr)window.prompt=function(m,d){return pr.call(window,strip(m),d)};
+  if(document.body)init();else document.addEventListener('DOMContentLoaded',init);
+  return {svg:function(n,c){return svg([n,c])},strip:strip};
+})();
+</script>
 </head>
 <body>
 <div id="lock"></div>
@@ -336,7 +499,7 @@ body.choosing .sidebar,body.choosing .bottomnav{display:none}
     <div class="side-foot">
       <span id="side-install"></span>
       <button class="btn btn-sm" data-action="theme-toggle">Changer de thème</button>
-      <span>100 % local · fonctionne hors ligne</span>
+      <span>🔒 100 % local · fonctionne hors ligne</span>
     </div>
   </aside>
 
@@ -377,7 +540,7 @@ var TLL=(function(){
     lundi:'Monday',mardi:'Tuesday',mercredi:'Wednesday',jeudi:'Thursday',vendredi:'Friday',samedi:'Saturday',dimanche:'Sunday',
     lun:'Mon',mar:'Tue',mer:'Wed',jeu:'Thu',ven:'Fri',sam:'Sat',dim:'Sun'};
   var MORE=/(^|[^\p{L}])(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|janv|févr|avr|juil|sept|oct|nov|déc|lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)(\.?)(?=[^\p{L}]|$)/giu;
-  function norm(s){return String(s).replace(/[\s  ]+/g,' ').trim()}
+  function norm(s){return String(s).replace(/(?:[\p{Extended_Pictographic}\p{Regional_Indicator}][\uFE0F\u200D\u20E3]*)+/gu,'').replace(/[\s  ]+/g,' ').trim()}
   function up(s){return s.charAt(0).toUpperCase()+s.slice(1)}
   function lo(s){return s.charAt(0).toLowerCase()+s.slice(1)}
   function escR(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
@@ -388,7 +551,7 @@ var TLL=(function(){
       if(/\{#?\}/.test(n)){var parts=n.split(/(\{#?\})/),rs='';
         for(var q=0;q<parts.length;q++)rs+=q%2?(parts[q]==='{#}'?'([\\d\\s.,/%+−-]+?)':'(.+?)'):escR(parts[q]);
         P.push({re:new RegExp('^'+rs+'$','u'),out:src[k],w:n.replace(/\{#?\}/g,'').length})}
-      else{D[n]=src[k];if(!window.TLL_NOSUB&&n.length>=4&&n.indexOf(' ')>0)keys.push(n)}}
+      else{D[n]=String(src[k]).replace(/(?:[\p{Extended_Pictographic}\p{Regional_Indicator}][\uFE0F\u200D\u20E3]*)+ ?/gu,'');if(!window.TLL_NOSUB&&n.length>=4&&n.indexOf(' ')>0)keys.push(n)}}
     P.sort(function(a,b){return b.w-a.w});
     (window.TLL_SUBX||[]).forEach(function(k){k=norm(k);if(D.hasOwnProperty(k)&&keys.indexOf(k)<0)keys.push(k)});
     keys.sort(function(a,b){return b.length-a.length});
@@ -505,11 +668,11 @@ var TLL=(function(){
     if(was==='en'&&l==='fr')restore();
     apply();
     try{document.querySelectorAll('.tl-lang button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===L)});
-      document.querySelectorAll('.tl-lang-t').forEach(function(t){t.textContent=''+(L==='en'?'Language':'Langue')})}catch(e){}
+      document.querySelectorAll('.tl-lang-t').forEach(function(t){t.textContent='🌍 '+(L==='en'?'Language':'Langue')})}catch(e){}
   }
   function switcher(noTitle){
     var b=function(k,lab){return '<button type="button" data-l="'+k+'" class="'+(L===k?'on':'')+'" onclick="TLL.set(\''+k+'\')">'+lab+'</button>'};
-    return '<div class="tl-lang-w" data-notr>'+(noTitle?'':'<div class="tl-lang-t">'+(L==='en'?'Language':'Langue')+'</div>')+'<div class="tl-lang" role="group" aria-label="Langue / Language">'+b('fr','Français')+b('en','English')+'</div></div>';
+    return '<div class="tl-lang-w" data-notr>'+(noTitle?'':'<div class="tl-lang-t">🌍 '+(L==='en'?'Language':'Langue')+'</div>')+'<div class="tl-lang" role="group" aria-label="Langue / Language">'+b('fr','🇫🇷 Français')+b('en','🇬🇧 English')+'</div></div>';
   }
   /* Le titre « Langue » suit la langue choisie */
   var css='.tl-lang-w{margin:12px 0}.tl-lang-t{font-weight:700;font-size:14px;margin:0 0 6px}.tl-lang{display:flex;gap:8px}'
@@ -555,25 +718,25 @@ var TLL_EN={
 "← Retour à la présentation": "← Back to the overview",
 "Bilan de fin de mois": "End-of-month review",
 "Où est parti mon argent ?": "Where did my money go?",
-"Camembert": "Pie",
-"Barres": "Bars",
+"🍩 Camembert": "🍩 Pie",
+"📊 Barres": "📊 Bars",
 "Voir le bilan détaillé et les conseils": "See the detailed review and tips",
 "Mes portefeuilles": "My wallets",
 "Chaque portefeuille a son propre solde, ses dépenses, ses budgets et son mode survie. Rien ne se mélange.": "Each wallet has its own balance, expenses, budgets and survival mode. Nothing gets mixed up.",
 "Commerce / projet": "Business / project",
 "Argent personnel": "Personal money",
 " · actif": " · active",
-"Nouveau portefeuille": "New wallet",
+"➕ Nouveau portefeuille": "➕ New wallet",
 "Nom": "Name",
 "Type": "Type",
 "Ex : Ma boutique, Business Wax, Projet T-shirts": "E.g. My shop, Wax business, T-shirt project",
-"Commerce / projet (catégories pro)": "Business / project (business categories)",
-"Personnel": "Personal",
+"🏪 Commerce / projet (catégories pro)": "🏪 Business / project (business categories)",
+"👤 Personnel": "👤 Personal",
 "Créer et ouvrir": "Create and open",
-"Portefeuille actif": "Active wallet",
+"✏️ Portefeuille actif": "✏️ Active wallet",
 "Renommer": "Rename",
-"Supprimer ce portefeuille": "Delete this wallet",
-"La sauvegarde (Réglages) concerne le portefeuille actif : faites-en une par portefeuille.": "Backups (Settings) cover the active wallet: make one per wallet.",
+"🗑️ Supprimer ce portefeuille": "🗑️ Delete this wallet",
+"💾 La sauvegarde (Réglages) concerne le portefeuille actif : faites-en une par portefeuille.": "💾 Backups (Settings) cover the active wallet: make one per wallet.",
 "Un commerce ou un projet à suivre à part ? Touchez le portefeuille.": "A business or project to track separately? Tap the wallet.",
 "Personnel": "Personal",
 "Perso": "Personal",
@@ -598,15 +761,15 @@ var TLL_EN={
 "Essai gratuit en cours : il reste {}": "Free trial running: {} left",
 "← Continuer l'essai gratuit": "← Continue the free trial",
 "Votre essai gratuit de 48 h est terminé. Vos données sont conservées : activez Budget Flow pour les retrouver.": "Your 24-hour free trial has ended. Your data is kept: activate Budget Flow to get it back.",
-"Essayez gratuitement pendant 48 h": "Try it free for 48 hours",
+"🎁 Essayez gratuitement pendant 48 h": "🎁 Try it free for 48 hours",
 "Essayez gratuitement pendant 48 h": "Try it free for 48 hours",
 "Accès complet, sans paiement ni engagement. Ensuite, un code d'activation sera demandé ; vos données seront conservées.": "Full access, no payment, no commitment. After that, an activation code is required; your data is kept.",
 "Commencer l'essai gratuit": "Start the free trial",
 "Essai gratuit activé : 48 h pour tout découvrir !": "Free trial started: 48 hours to explore everything!",
-"Essai gratuit": "Free trial",
+"🎁 Essai gratuit": "🎁 Free trial",
 "Essai gratuit": "Free trial",
 "Temps restant": "Time left",
-"Activer maintenant": "Activate now",
+"🔑 Activer maintenant": "🔑 Activate now",
 "Activer maintenant": "Activate now",
 "Puis-je essayer avant d'acheter ?": "Can I try before buying?",
 "Oui : sur l'écran d'activation, touchez « Commencer l'essai gratuit » pour utiliser Budget Flow pendant 48 h sans code (une seule fois par téléphone). À la fin, l'appli demande un code d'activation ; vos données sont conservées.": "Yes: on the activation screen, tap “Start the free trial” to use Budget Flow for 48 hours without a code (once per phone). Afterwards the app asks for an activation code; your data is kept.",
@@ -644,7 +807,7 @@ var TLL_EN={
 "Mode complet activé. Bienvenue !": "Full mode on. Welcome!",
 "Mode simple activé.": "Simple mode on.",
 "Mode complet activé.": "Full mode on.",
-"Mode simple ou mode complet": "Simple or full mode",
+"🧭 Mode simple ou mode complet": "🧭 Simple or full mode",
 "Au premier lancement, Budget Flow vous demande comment vous voulez l'utiliser :": "On first launch, Budget Flow asks how you want to use it:",
 ": tableau de bord, journal, entrées, sorties et objectifs. L'essentiel pour savoir où va votre argent.": ": dashboard, log, income, spending and goals. The essentials to see where your money goes.",
 ": tout le mode simple, plus le mode survie, les projections et plafonds, le simulateur d'achat, la caisse de secours et le bilan détaillé du mois.": ": everything in simple mode, plus survival mode, projections and limits, the purchase simulator, the emergency fund and the detailed monthly report.",
@@ -709,11 +872,11 @@ var TLL_EN={
 "Retour": "Back",
 "← Retour": "← Back",
 "Copier": "Copy",
-"Copié": "Copied",
+"Copié ✅": "Copied ✅",
 "Copié ✓": "Copied ✓",
 "Copié !": "Copied!",
 "Coller": "Paste",
-"Collé": "Pasted",
+"Collé ✅": "Pasted ✅",
 "Activer": "Activate",
 "Réglages": "Settings",
 "Paramètres": "Settings",
@@ -751,17 +914,17 @@ var TLL_EN={
 "QR": "QR",
 "Ouverture de la caméra…": "Opening the camera…",
 "Chargement du lecteur…": "Loading the scanner…",
+"🎯 Vise le QR code…": "🎯 Aim at the QR code…",
 "Vise le QR code…": "Aim at the QR code…",
-"Vise le QR code…": "Aim at the QR code…",
-"Caméra non disponible ici. Ouvre l'appli installée (site en https).": "Camera not available here. Open the installed app (https site).",
-"Caméra non disponible ici. Ouvre l’appli installée (site en https).": "Camera not available here. Open the installed app (https site).",
-"Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.": "Camera access denied. Allow it in your browser settings.",
-"Lecteur QR indisponible hors ligne sur ce téléphone. Utilise le message ou le fichier.": "QR scanner unavailable offline on this phone. Use the message or the file.",
+"📵 Caméra non disponible ici. Ouvre l'appli installée (site en https).": "📵 Camera not available here. Open the installed app (https site).",
+"📵 Caméra non disponible ici. Ouvre l’appli installée (site en https).": "📵 Camera not available here. Open the installed app (https site).",
+"📵 Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.": "📵 Camera access denied. Allow it in your browser settings.",
+"❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilise le message ou le fichier.": "❌ QR scanner unavailable offline on this phone. Use the message or the file.",
 "Contacter le support": "Contact support",
 "Thousand Labs": "Thousand Labs",
 "Une appli de": "An app by",
 "Découvrir nos autres applis": "Discover our other apps",
-"Activée": "Activated",
+"Activée ✅": "Activated ✅",
 "Zone sensible": "Danger zone",
 "Ton navigateur peut installer": "Your browser can install",
 "comme une vraie application : icône propre (sans logo de navigateur), plein écran et ouverture hors ligne.": "as a real app: its own icon (no browser logo), full screen and offline access.",
@@ -774,7 +937,7 @@ var TLL_EN={
 "{} Ko": "{} KB",
 "Ko": "KB",
 "Changer de thème": "Change theme",
-"100 % local · fonctionne hors ligne": "100% local · works offline",
+"🔒 100 % local · fonctionne hors ligne": "🔒 100% local · works offline",
 "Votre navigateur peut installer {} comme une vraie application : icône propre (sans logo de navigateur), plein écran et ouverture hors ligne.": "Your browser can install {} as a real app: its own icon (no browser logo), full screen and offline access.",
 "Votre navigateur peut installer": "Your browser can install",
 "Vous avez déjà une icône avec le petit logo du navigateur ? Après l'installation, faites une sauvegarde de vos données, puis supprimez l'ancienne icône.": "Already have an icon with the small browser logo? After installing, back up your data, then delete the old icon.",
@@ -839,18 +1002,18 @@ var TLL_EN={
 "Demander mon code sur WhatsApp": "Request my code on WhatsApp",
 "Collez ici le code reçu (tout le texte)": "Paste the code you received here (all the text)",
 "Activer Budget Flow": "Activate Budget Flow",
-"Scanner le code du vendeur": "Scan the seller's code",
+"📷 Scanner le code du vendeur": "📷 Scan the seller's code",
 "Découvrir l'application et le guide": "Discover the app and the guide",
 "Découvrir l’application et le guide": "Discover the app and the guide",
 "· paiement unique · WhatsApp": "· one-time payment · WhatsApp",
-"Installer l'application": "Install the app",
-"Installer l’application": "Install the app",
+"📲 Installer l'application": "📲 Install the app",
+"📲 Installer l’application": "📲 Install the app",
 "en haut à droite.": "at the top right.",
 "« Ajouter à l'écran d'accueil »": "“Add to Home screen”",
 "« Ajouter à l’écran d’accueil »": "“Add to Home screen”",
 "Touchez le bouton": "Tap the button",
 "(carré avec une flèche).": "(square with an arrow).",
-"Ordinateur (Chrome, Edge)": "Computer (Chrome, Edge)",
+"💻 Ordinateur (Chrome, Edge)": "💻 Computer (Chrome, Edge)",
 "Sur iPhone, installez l'appli": "On iPhone, install the app",
 "Sur iPhone, installez l’appli": "On iPhone, install the app",
 "de l'activer, puis ouvrez-la depuis son icône : l'iPhone sépare Safari et les applis installées.": "activating it, then open it from its icon: the iPhone keeps Safari and installed apps separate.",
@@ -875,7 +1038,7 @@ var TLL_EN={
 "aucun plafond": "no limit",
 "Tableau de bord": "Dashboard",
 "Dépense": "Expense",
-"Bienvenue sur Budget Flow": "Welcome to Budget Flow",
+"Bienvenue sur Budget Flow 👋": "Welcome to Budget Flow 👋",
 "Trois étapes pour démarrer. Vos données restent sur cet appareil.": "Three steps to get started. Your data stays on this device.",
 "Indiquer l'argent dont vous disposez aujourd'hui": "Enter the money you have today",
 "Indiquer l’argent dont vous disposez aujourd’hui": "Enter the money you have today",
@@ -933,7 +1096,7 @@ var TLL_EN={
 "/jour": "/day",
 "· Solde à zéro vers le": "· Balance at zero around",
 "· Avec la caisse de secours :": "· With the emergency fund:",
-"Dépenser": "Spending",
+"💡 Dépenser": "💡 Spending",
 "de moins par jour vous ferait gagner une semaine.": "less per day would gain you a week.",
 "Autonomie critique :": "Critical autonomy:",
 "jour(s) de survie financière restants.": "day(s) of financial survival left.",
@@ -1018,7 +1181,7 @@ var TLL_EN={
 "Ex : déjeuner, taxi…": "E.g. lunch, taxi…",
 "Ajouter la dépense": "Add expense",
 "· sans plafond": "· no limit",
-"Dépassé de": "Over by",
+"⚠️ Dépassé de": "⚠️ Over by",
 "Reste": "Left",
 "Module 4": "Module 4",
 "Vos habitudes converties en jour, semaine, mois et année, avec des plafonds d’alerte.": "Your habits converted per day, week, month and year, with alert limits.",
@@ -1089,14 +1252,14 @@ var TLL_EN={
 "Fin de mois avec scénarios": "End of month with scenarios",
 "Cette combinaison vous met dans le rouge de": "This combination puts you in the red by",
 "Saisissez un montant pour obtenir un verdict.": "Enter an amount to get a verdict.",
-"Déconseillé : il vous manquerait": "Not advised: you'd be short by",
+"❌ Déconseillé : il vous manquerait": "❌ Not advised: you'd be short by",
 "en fin de mois.": "at the end of the month.",
 "La caisse de secours pourrait couvrir, mais elle est réservée aux urgences.": "The emergency fund could cover it, but it's reserved for emergencies.",
-"Risqué : il ne resterait que": "Risky: you'd only have",
+"⚠️ Risqué : il ne resterait que": "⚠️ Risky: you'd only have",
 ", moins d'une semaine de dépenses.": "left, less than a week of spending.",
 ", moins d’une semaine de dépenses.": "left, less than a week of spending.",
 "Faisable mais tendu : il resterait": "Doable but tight: you'd have left",
-"Faisable : il resterait": "Doable: you'd have left",
+"✅ Faisable : il resterait": "✅ Doable: you'd have left",
 "Fin de mois après achat": "End of month after purchase",
 "Cet achat équivaut à": "This purchase equals",
 "jour(s) d'autonomie": "day(s) of autonomy",
@@ -1105,8 +1268,8 @@ var TLL_EN={
 "Module 6": "Module 6",
 "Épargne d’urgence, isolée de votre solde courant.": "Emergency savings, kept apart from your current balance.",
 "Épargne d'urgence, isolée de votre solde courant.": "Emergency savings, kept apart from your current balance.",
-"Caisse de secours": "Emergency fund",
-"Isolée": "Isolated",
+"🛡️ Caisse de secours": "🛡️ Emergency fund",
+"🔒 Isolée": "🔒 Isolated",
 "Couvre environ": "Covers about",
 "de dépenses au rythme actuel.": "of spending at the current pace.",
 "% de l'objectif :": "% of the goal:",
@@ -1141,7 +1304,7 @@ var TLL_EN={
 "Pour le": "By",
 "/semaine)": "/week)",
 "Cible :": "Target:",
-"Atteint": "Reached",
+"🎉 Atteint": "🎉 Reached",
 "Objectif atteint, bravo !": "Goal reached, well done!",
 "Retirer": "Withdraw",
 "Module 8": "Module 8",
@@ -1199,7 +1362,7 @@ var TLL_EN={
 "Budget Flow s'installe sur l'écran d'accueil comme une application classique, avec son icône, et fonctionne ensuite": "Budget Flow installs on the home screen like a regular app, with its icon, and then works",
 "Budget Flow s’installe sur l’écran d’accueil comme une application classique, avec son icône, et fonctionne ensuite": "Budget Flow installs on the home screen like a regular app, with its icon, and then works",
 "sans Internet": "without Internet",
-"Premiers pas (5 minutes)": "Getting started (5 minutes)",
+"🚀 Premiers pas (5 minutes)": "🚀 Getting started (5 minutes)",
 "Solde de départ": "Starting balance",
 ": dans Réglages, indiquez l'argent dont vous disposez aujourd'hui (espèces + mobile money + banque), hors épargne.": ": in Settings, enter the money you have today (cash + mobile money + bank), excluding savings.",
 ": dans Réglages, indiquez l’argent dont vous disposez aujourd’hui (espèces + mobile money + banque), hors épargne.": ": in Settings, enter the money you have today (cash + mobile money + bank), excluding savings.",
@@ -1211,7 +1374,7 @@ var TLL_EN={
 ": notez chaque dépense avec le bouton": ": record each expense with the button",
 ". C'est la seule habitude à prendre.": ". It's the only habit you need.",
 ". C’est la seule habitude à prendre.": ". It's the only habit you need.",
-"Comprendre le « solde disponible »": "Understanding the “available balance”",
+"💰 Comprendre le « solde disponible »": "💰 Understanding the “available balance”",
 "C'est l'argent que vous pouvez réellement dépenser :": "It's the money you can actually spend:",
 "C’est l’argent que vous pouvez réellement dépenser :": "It's the money you can actually spend:",
 "solde de départ + revenus + ventes − dépenses − argent mis de côté": "starting balance + income + sales − expenses − money set aside",
@@ -1265,7 +1428,7 @@ var TLL_EN={
 "9. Objectifs d’épargne": "9. Savings goals",
 "Créez une cible (ordinateur, formation…) avec un montant et une échéance. L'appli calcule combien verser chaque mois et chaque semaine pour y arriver à temps.": "Create a target (computer, training…) with an amount and a deadline. The app calculates how much to put aside each month and week to get there on time.",
 "Créez une cible (ordinateur, formation…) avec un montant et une échéance. L’appli calcule combien verser chaque mois et chaque semaine pour y arriver à temps.": "Create a target (computer, training…) with an amount and a deadline. The app calculates how much to put aside each month and week to get there on time.",
-"Sauvegarde & changement de téléphone": "Backup & changing phones",
+"💾 Sauvegarde & changement de téléphone": "💾 Backup & changing phones",
 "Vos données restent": "Your data stays",
 "uniquement sur cet appareil": "only on this device",
 ": aucune inscription, aucun serveur.": ": no sign-up, no server.",
@@ -1278,7 +1441,7 @@ var TLL_EN={
 "votre sauvegarde.": "your backup.",
 "Ouvrez toujours l'appli depuis son icône : sur iPhone, Safari et l'appli installée ne partagent pas les mêmes données.": "Always open the app from its icon: on iPhone, Safari and the installed app don't share the same data.",
 "Ouvrez toujours l’appli depuis son icône : sur iPhone, Safari et l’appli installée ne partagent pas les mêmes données.": "Always open the app from its icon: on iPhone, Safari and the installed app don't share the same data.",
-"Questions fréquentes": "FAQ",
+"❓ Questions fréquentes": "❓ FAQ",
 "Faut-il Internet ?": "Do I need Internet?",
 "Seulement la toute première fois, pour installer l'appli. Ensuite, tout fonctionne hors ligne.": "Only the very first time, to install the app. After that, everything works offline.",
 "Seulement la toute première fois, pour installer l’appli. Ensuite, tout fonctionne hors ligne.": "Only the very first time, to install the app. After that, everything works offline.",
@@ -1382,7 +1545,7 @@ var TLL_EN={
 "Objectif enregistré.": "Goal saved.",
 "Montant supérieur à l’épargne de cet objectif.": "Amount higher than this goal's savings.",
 "Montant supérieur à l'épargne de cet objectif.": "Amount higher than this goal's savings.",
-"Objectif «": "Goal “",
+"🎉 Objectif «": "🎉 Goal “",
 "» atteint !": "” reached!",
 "Réglages enregistrés.": "Settings saved.",
 "Solde de départ enregistré.": "Starting balance saved.",
@@ -1391,7 +1554,7 @@ var TLL_EN={
 "Le vendeur scanne ce QR code avec Thousand Admin.": "The seller scans this QR code with Thousand Admin.",
 "Scanner le code": "Scan the code",
 "Visez le QR code affiché par le vendeur.": "Aim at the QR code shown by the seller.",
-"Ce code ne correspond pas à cet appareil": "This code doesn't match this device",
+"❌ Ce code ne correspond pas à cet appareil": "❌ This code doesn't match this device",
 "Installer Budget Flow": "Install Budget Flow",
 "Découvrir Budget Flow": "Discover Budget Flow",
 "Gestion financière personnelle et suivi de petits projets, 100 % hors ligne et privée. Voici le guide complet :": "Personal finance management and small-project tracking, 100% offline and private. Here's the full guide:",
@@ -1492,15 +1655,15 @@ var TLI=(function(){
   function inner(name,btn){
     var st='',S='style="margin:6px 0 0;font-size:13.5px;line-height:1.5;opacity:.85"';
     if(evt)st='<p style="margin:0 0 8px;font-size:14.5px;line-height:1.5">'+T('Ton navigateur peut installer {app} comme une vraie application : icône propre (sans logo de navigateur), plein écran et ouverture hors ligne.').replace('{app}','<b>'+name+'</b>')+'</p>'
-      +'<button type="button" class="'+btn+'" style="width:100%" onclick="TLI.go()">'+T('Installer {app}').replace('{app}',name)+'</button>'
+      +'<button type="button" class="'+btn+'" style="width:100%" onclick="TLI.go()">📲 '+T('Installer {app}').replace('{app}',name)+'</button>'
       +'<p '+S+'>'+T('Tu as déjà une icône avec le petit logo du navigateur ? Après l\'installation, fais une sauvegarde de tes données, puis supprime l\'ancienne icône.')+'</p>';
-    else if(sa())st='<p style="margin:0;font-size:14.5px;line-height:1.5">'+T('{app} est ouverte comme une application.').replace('{app}','<b>'+name+'</b>')+'</p>'
+    else if(sa())st='<p style="margin:0;font-size:14.5px;line-height:1.5">✅ '+T('{app} est ouverte comme une application.').replace('{app}','<b>'+name+'</b>')+'</p>'
       +'<p '+S+'>'+T('Si son icône porte le petit logo de ton navigateur, c\'est un simple raccourci. Pour une installation complète, suis les étapes ci-dessous.')+'</p>';
     else st='<p style="margin:0;font-size:14.5px;line-height:1.5">'+T('Installe {app} sur ton écran d\'accueil : elle s\'ouvrira comme une vraie application, même sans Internet.').replace('{app}','<b>'+name+'</b>')+'</p>';
-    var B=bw();if(B&&!evt&&!sa())st='<p style="margin:0 0 10px;font-size:14.5px;line-height:1.5;color:#f59e0b">'+T('Tu utilises {b} : il ne peut créer qu\'un simple raccourci. Pour installer la vraie application, ouvre ce lien dans Chrome.').replace('{b}','<b>'+B+'</b>')+'</p><button type="button" class="'+btn+'" style="width:100%;margin-bottom:10px" onclick="TLI.copy()">'+T('Copier le lien pour l\'ouvrir dans Chrome')+'</button>'+st;
-    var A='<p style="margin:10px 0 4px"><b>Android (Chrome)</b></p><ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.55"><li>'+T('Ouvre le lien de l\'appli dans <b>Chrome</b>, avec Internet. Brave, Opera et les autres navigateurs ne créent qu\'un simple raccourci.')+'</li><li>'+T('Touche le menu <b>⋮</b> (en haut ou en bas à droite).')+'</li><li>'+T('Choisis <b>« Installer l\'application »</b>. Évite « Ajouter à l\'écran d\'accueil » : ça crée un simple raccourci avec le logo du navigateur.')+'</li><li>'+T('Si « Installer » n\'apparaît pas : recharge la page, attends quelques secondes et réessaie.')+'</li></ol>';
-    var I='<p style="margin:10px 0 4px"><b>iPhone / iPad (Safari)</b></p><ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.55"><li>'+T('Ouvre le lien dans <b>Safari</b>.')+'</li><li>'+T('Touche <b>Partager</b> (le carré avec une flèche).')+'</li><li>'+T('Choisis <b>« Sur l\'écran d\'accueil »</b>, puis <b>Ajouter</b>.')+'</li></ol><p '+S+'>'+T('Sur iPhone, installe l\'appli AVANT de l\'activer, puis ouvre-la toujours depuis son icône : l\'iPhone sépare Safari et les applis installées.')+'</p>';
-    var C='<p style="margin:10px 0 4px"><b>'+T('Ordinateur (Chrome, Edge, Brave)')+'</b></p><p style="margin:0;font-size:14px">'+T('Clique sur l\'icône d\'installation à droite de la barre d\'adresse.')+'</p>';
+    var B=bw();if(B&&!evt&&!sa())st='<p style="margin:0 0 10px;font-size:14.5px;line-height:1.5;color:#f59e0b">⚠️ '+T('Tu utilises {b} : il ne peut créer qu\'un simple raccourci. Pour installer la vraie application, ouvre ce lien dans Chrome.').replace('{b}','<b>'+B+'</b>')+'</p><button type="button" class="'+btn+'" style="width:100%;margin-bottom:10px" onclick="TLI.copy()">📋 '+T('Copier le lien pour l\'ouvrir dans Chrome')+'</button>'+st;
+    var A='<p style="margin:10px 0 4px"><b>📱 Android (Chrome)</b></p><ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.55"><li>'+T('Ouvre le lien de l\'appli dans <b>Chrome</b>, avec Internet. Brave, Opera et les autres navigateurs ne créent qu\'un simple raccourci.')+'</li><li>'+T('Touche le menu <b>⋮</b> (en haut ou en bas à droite).')+'</li><li>'+T('Choisis <b>« Installer l\'application »</b>. Évite « Ajouter à l\'écran d\'accueil » : ça crée un simple raccourci avec le logo du navigateur.')+'</li><li>'+T('Si « Installer » n\'apparaît pas : recharge la page, attends quelques secondes et réessaie.')+'</li></ol>';
+    var I='<p style="margin:10px 0 4px"><b>🍏 iPhone / iPad (Safari)</b></p><ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.55"><li>'+T('Ouvre le lien dans <b>Safari</b>.')+'</li><li>'+T('Touche <b>Partager</b> (le carré avec une flèche).')+'</li><li>'+T('Choisis <b>« Sur l\'écran d\'accueil »</b>, puis <b>Ajouter</b>.')+'</li></ol><p '+S+'>⚠️ '+T('Sur iPhone, installe l\'appli AVANT de l\'activer, puis ouvre-la toujours depuis son icône : l\'iPhone sépare Safari et les applis installées.')+'</p>';
+    var C='<p style="margin:10px 0 4px"><b>💻 '+T('Ordinateur (Chrome, Edge, Brave)')+'</b></p><p style="margin:0;font-size:14px">'+T('Clique sur l\'icône d\'installation à droite de la barre d\'adresse.')+'</p>';
     var steps=ios()?I+A+C:A+I+C;
     return st+'<details style="margin-top:10px"'+(evt||sa()?'':' open')+'><summary style="cursor:pointer;font-weight:600;font-size:14px">'+T('Comment installer, pas à pas')+'</summary>'+steps+'</details>';
   }
@@ -1532,7 +1695,6 @@ TLI.t=function(s){var V={
    ========================================================================= */
 const $ = s => document.querySelector(s);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const mono = s => esc(String(s || '?').trim().split(/\s+/).filter(w => /[\p{L}\p{N}]/u.test(w)).slice(0, 2).map(w => w.match(/[\p{L}\p{N}]/u)[0]).join('').toUpperCase() || '?');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // Montants : « 10.000 », « 10 000 », « 1.500.000 », « 2,500,000 » = séparateurs de milliers ; « 1,5 » = décimale.
 const numDec = v => {
@@ -1600,17 +1762,17 @@ const icon = (n, s = 20) => `<svg class="ic" width="${s}" height="${s}" viewBox=
 const KEY = 'budgetflow_v1';
 const CURRENCIES = ['FCFA', 'EUR', 'USD', 'GBP', 'CAD', 'CHF', 'MAD', 'CNY'];
 const INCOME_TYPES = ['Bourse', 'Salaire', 'Aide familiale', 'Transfert reçu', 'Prestation', 'Autre'];
-const INCOME_IC = {'Bourse':'', 'Salaire':'', 'Aide familiale':'', 'Transfert reçu':'', 'Prestation':'', 'Autre':''};
+const INCOME_IC = {'Bourse':'🎓', 'Salaire':'💼', 'Aide familiale':'🤝', 'Transfert reçu':'🌍', 'Prestation':'🧰', 'Autre':'💰'};
 const COLORS = ['#0f766e','#2563eb','#d97706','#dc2626','#7c3aed','#db2777','#0891b2','#65a30d','#ea580c','#4f46e5','#059669','#9333ea','#64748b','#ca8a04'];
 const PER = {jour: 1, semaine: 7, mois: 30.44, an: 365};
 
 // Catégories par défaut, pensées pour étudiants et indépendants
 const DEFAULT_CATS = [
-  ['Loyer','fixe',''], ['Électricité (Woyofal)','fixe',''], ['Eau','fixe',''],
-  ['Internet / Forfait mobile','fixe',''], ['Abonnements','fixe',''], ['Scolarité / Formation','fixe',''],
-  ['Nourriture','variable',''], ['Transport','variable',''], ['Loisirs & sorties','variable',''],
-  ['Santé','variable',''], ['Fournitures & matériel','variable',''], ['Habillement & hygiène','variable',''],
-  ['Famille & solidarité','variable',''], ['Imprévus','variable','']
+  ['Loyer','fixe','🏠'], ['Électricité (Woyofal)','fixe','⚡'], ['Eau','fixe','💧'],
+  ['Internet / Forfait mobile','fixe','📶'], ['Abonnements','fixe','🔁'], ['Scolarité / Formation','fixe','🎓'],
+  ['Nourriture','variable','🍽️'], ['Transport','variable','🚌'], ['Loisirs & sorties','variable','🎉'],
+  ['Santé','variable','💊'], ['Fournitures & matériel','variable','📚'], ['Habillement & hygiène','variable','🧴'],
+  ['Famille & solidarité','variable','🤝'], ['Imprévus','variable','⚠️']
 ].map(([name, kind, ic], i) => ({id: 'c' + i, name, kind, icon: ic, budget: 0}));
 
 const defaultData = () => ({
@@ -1638,14 +1800,14 @@ const defaultData = () => ({
    les dépenses d'un commerce ne touchent jamais le solde ni le mode survie perso. */
 const WKEY = 'budgetflow_wallets';
 const PRO_CATS = [
-  ['Achats de marchandises','variable',''], ['Loyer du local','fixe',''], ['Électricité / eau (local)','fixe',''],
-  ['Internet / téléphone pro','fixe',''], ['Transport & livraison','variable',''], ['Salaires & aides','fixe',''],
-  ['Publicité & réseaux sociaux','variable',''], ['Emballages & fournitures','variable',''], ['Matériel & outils','variable',''],
-  ['Impôts, taxes & frais','variable',''], ['Frais Wave / Orange Money','variable',''], ['Imprévus','variable','']
+  ['Achats de marchandises','variable','📦'], ['Loyer du local','fixe','🏬'], ['Électricité / eau (local)','fixe','⚡'],
+  ['Internet / téléphone pro','fixe','📶'], ['Transport & livraison','variable','🚚'], ['Salaires & aides','fixe','👥'],
+  ['Publicité & réseaux sociaux','variable','📣'], ['Emballages & fournitures','variable','🛍️'], ['Matériel & outils','variable','🧰'],
+  ['Impôts, taxes & frais','variable','🧾'], ['Frais Wave / Orange Money','variable','💸'], ['Imprévus','variable','⚠️']
 ].map(([name, kind, ic], i) => ({id: 'p' + i, name, kind, icon: ic, budget: 0}));
 function loadW() {
   let w = null; try { w = cleanData(JSON.parse(localStorage.getItem(WKEY))); } catch (e) {}
-  if (!w || !Array.isArray(w.list) || !w.list.length) w = {active: 'main', list: [{id: 'main', name: 'Personnel', icon: '', kind: 'perso'}]};
+  if (!w || !Array.isArray(w.list) || !w.list.length) w = {active: 'main', list: [{id: 'main', name: 'Personnel', icon: '👤', kind: 'perso'}]};
   if (!w.list.some(x => x.id === w.active)) w.active = w.list[0].id;
   return w;
 }
@@ -1690,7 +1852,7 @@ const LIC_KEY = 'budgetflow_licence';
 const ALPHA = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const cleanCode = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-/* ---------- Nettoyage des données entrantes (sauvegarde, synchro, import, démarrage) ----------
+/* ---------- 🛡️ Nettoyage des données entrantes (sauvegarde, synchro, import, démarrage) ----------
    Les champs techniques (identifiants, dates, moyens de paiement, devise…) ne gardent que des caractères
    inoffensifs ; dans les textes libres, < > " ` sont remplacés par des signes équivalents.
    Ainsi, un fichier ou une synchro piégés ne peuvent jamais exécuter de code dans l'appli. */
@@ -1747,7 +1909,7 @@ function trialInfo() {
 }
 const canUse = () => isActivated() || trialInfo().active;
 
-/* ---------- Traces de l'essai gratuit ----------
+/* ---------- 🎁 Traces de l'essai gratuit ----------
    La date de début de l'essai est recopiée à 4 endroits (stockage local, cookie, base interne, cache).
    S'il en reste une seule, l'essai est restauré : effacer « juste le cache » ou « juste les cookies »
    ne relance pas l'essai. Seul l'effacement complet des données du site y parvient… et il efface aussi
@@ -1771,7 +1933,7 @@ const fmtLeft = ms => { const m = Math.max(1, Math.ceil(ms / 60000)), h = Math.f
 function trialBar() {
   if (isActivated()) return '';
   const ti = trialInfo(); if (!ti.active) return '';
-  return `<div id="trialBar" class="alert alert-amber no-print" style="margin-bottom:14px;align-items:center"><span class="a-ic"></span><span style="flex:1">Essai gratuit : il reste ${fmtLeft(ti.left)}</span><button class="btn btn-sm btn-primary" data-action="trial-buy">Activer</button></div>`;
+  return `<div id="trialBar" class="alert alert-amber no-print" style="margin-bottom:14px;align-items:center"><span class="a-ic">🎁</span><span style="flex:1">Essai gratuit : il reste ${fmtLeft(ti.left)}</span><button class="btn btn-sm btn-primary" data-action="trial-buy">Activer</button></div>`;
 }
 function trialTick() {
   if (isActivated()) { clearInterval(trialTimer); trialTimer = null; return; }
@@ -1838,21 +2000,21 @@ let scanStream=null,scanTimer=null;
 function loadJsQR(){return new Promise((ok,ko)=>{if(window.jsQR)return ok();const s=document.createElement('script');s.src='./jsQR.js';/* jsQR 1.4.0 (github.com/cozmo/jsQR), hébergé avec l'appli : aucun script externe */s.onload=()=>window.jsQR?ok():ko();s.onerror=ko;document.head.appendChild(s)})}
 async function startScan(video,status,onText){
   stopScan();
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){status.textContent='Caméra non disponible ici. Ouvre l\'appli installée (site en https).';return}
-  try{scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false})}catch(e){status.textContent='Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.';return}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){status.textContent='📵 Caméra non disponible ici. Ouvre l\'appli installée (site en https).';return}
+  try{scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false})}catch(e){status.textContent='📵 Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.';return}
   video.setAttribute('playsinline','');video.muted=true;video.srcObject=scanStream;try{await video.play()}catch(e){}
   let detect=null;
   if('BarcodeDetector' in window){try{const bd=new BarcodeDetector({formats:['qr_code']});detect=async()=>{const r=await bd.detect(video);return r.length?r[0].rawValue:null}}catch(e){detect=null}}
-  if(!detect){status.textContent='Chargement du lecteur…';try{await loadJsQR()}catch(e){status.textContent='Lecteur QR indisponible hors ligne sur ce téléphone. Utilise le message ou le fichier.';stopScan();return}
+  if(!detect){status.textContent='Chargement du lecteur…';try{await loadJsQR()}catch(e){status.textContent='❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilise le message ou le fichier.';stopScan();return}
     const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
     detect=async()=>{const w=video.videoWidth,h=video.videoHeight;if(!w)return null;const s=Math.min(1,720/Math.max(w,h));cv.width=w*s|0;cv.height=h*s|0;cx.drawImage(video,0,0,cv.width,cv.height);const r=window.jsQR(cx.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height,{inversionAttempts:'dontInvert'});return r?r.data:null}}
   if(!scanStream)return;
-  status.textContent='Vise le QR code…';
+  status.textContent='🎯 Vise le QR code…';
   let busy=false;scanTimer=setInterval(async()=>{if(busy||!scanStream)return;busy=true;try{const t=await detect();if(t)onText(t)}catch(e){}busy=false},160);
 }
 function stopScan(){clearInterval(scanTimer);scanTimer=null;if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null}}
 
-const waLink = text => `https://wa.me/${CONTACT}?text=${encodeURIComponent(text)}`;
+const waLink = text => `https://wa.me/${CONTACT}?text=${encodeURIComponent(ICO.strip(text))}`;
 
 /* ---------- Thousand Labs : signature avec logo (écran d'activation + licence) ---------- */
 function tlBrand(big){var s=big?40:28;return '<div class="tlbrand" style="display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0 4px"><svg width="'+s+'" height="'+s+'" viewBox="0 -2 120 120" aria-hidden="true" style="flex-shrink:0"><path d="M20 102 V22 L60 72 L100 22 V102" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="60" cy="44" r="7" fill="#E8A317"/><circle cx="70" cy="27" r="4.5" fill="#E8A317"/></svg><span style="line-height:1.15;text-align:left"><span style="display:block;font-size:12px;opacity:.75">Une appli de</span><b style="letter-spacing:1.5px">THOUSAND LABS</b></span></div>'+(big?'<p style="text-align:center;margin:4px 0 0;font-size:14px"><a href="https://thousandlabs.github.io/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Découvrir nos autres applis</a></p>':'')}
@@ -1867,7 +2029,7 @@ var TLBUY=(function(){
   var C={app:'',dev:function(){return ''},plans:[],unit:0,pay:'221711216581',payFmt:'71 121 65 81',wa:'221711216581',lang:function(){return 'fr'},note:''};
   var S={p:0,q:1,m:'wave'};
   var EN={
-    "Acheter {app}":"Buy {app}",
+    "🛒 Acheter {app}":"🛒 Buy {app}",
     "1. Choisis ta formule":"1. Choose your plan","1. Choisissez votre formule":"1. Choose your plan",
     "personne":"person","personnes":"people","appareil":"device","appareils":"devices",
     "Nombre d’appareils":"Number of devices",
@@ -1882,8 +2044,8 @@ var TLBUY=(function(){
     "Identifiants des autres personnes (un par ligne)":"Other people’s device IDs (one per line)",
     "Facultatif : tu pourras aussi les envoyer plus tard.":"Optional: you can also send them later.",
     "Facultatif : vous pourrez aussi les envoyer plus tard.":"Optional: you can also send them later.",
-    "J’ai payé : envoyer ma demande":"I’ve paid: send my request",
-    "Envoyer ma demande (paiement en espèces)":"Send my request (cash payment)",
+    "✅ J’ai payé : envoyer ma demande":"✅ I’ve paid: send my request",
+    "💬 Envoyer ma demande (paiement en espèces)":"💬 Send my request (cash payment)",
     "Indique le numéro qui a payé, pour que le paiement soit vérifié.":"Enter the number that paid, so the payment can be checked.",
     "Indiquez le numéro qui a payé, pour que le paiement soit vérifié.":"Enter the number that paid, so the payment can be checked.",
     "Ton code arrive sur WhatsApp dès que le paiement est vérifié. Colle-le ensuite ci-dessous.":"Your code arrives on WhatsApp as soon as the payment is checked. Then paste it below.",
@@ -1908,15 +2070,15 @@ var TLBUY=(function(){
     else{h+='<div class="tlb-qty"><span>'+T('Nombre d’appareils')+'</span><button type="button" onclick="TLBUY.qty(-1)" aria-label="−">−</button><b>'+S.q+'</b><button type="button" onclick="TLBUY.qty(1)" aria-label="+">+</button></div><p class="tlb-mu">'+T('Un code par appareil.')+' '+fmtF(C.unit)+' × '+S.q+'</p>'}
     if(C.note)h+='<p class="tlb-mu">'+esc(C.note)+'</p>';
     h+='<div class="tlb-tot"><span>'+T('Total à payer')+'</span><b>'+fmtF(p.price)+'</b></div>';
-    h+='<p class="tlb-t">'+T(vous('2. Paie','2. Payez'))+'</p><div class="tlb-m">'+[['wave','Wave'],['om','Orange Money'],['cash',''+T('Espèces (en main propre)')]].map(function(m){return '<button type="button" class="'+(S.m===m[0]?'on':'')+'" onclick="TLBUY.meth(\''+m[0]+'\')">'+m[1]+'</button>'}).join('')+'</div>';
-    if(S.m!=='cash')h+='<div class="tlb-pay">'+T(vous('Envoie {total} au','Envoyez {total} au'),{total:'<b>'+fmtF(p.price)+'</b>'})+'<div class="tlb-num">'+C.payFmt+'</div><button type="button" class="tlb-b2" onclick="TLBUY.cpy(this)">'+T('Copier le numéro')+'</button></div>';
+    h+='<p class="tlb-t">'+T(vous('2. Paie','2. Payez'))+'</p><div class="tlb-m">'+[['wave','🌊 Wave'],['om','🟠 Orange Money'],['cash','💵 '+T('Espèces (en main propre)')]].map(function(m){return '<button type="button" class="'+(S.m===m[0]?'on':'')+'" onclick="TLBUY.meth(\''+m[0]+'\')">'+m[1]+'</button>'}).join('')+'</div>';
+    if(S.m!=='cash')h+='<div class="tlb-pay">'+T(vous('Envoie {total} au','Envoyez {total} au'),{total:'<b>'+fmtF(p.price)+'</b>'})+'<div class="tlb-num">'+C.payFmt+'</div><button type="button" class="tlb-b2" onclick="TLBUY.cpy(this)">📋 '+T('Copier le numéro')+'</button></div>';
     h+='<p class="tlb-t">'+T(vous('3. Envoie ta demande','3. Envoyez votre demande'))+'</p>';
     if(S.m!=='cash')h+='<label class="tlb-l" for="tlb-ph">'+T('Numéro qui a payé')+'</label><input id="tlb-ph" class="tlb-in" type="tel" inputmode="tel" autocomplete="tel" placeholder="'+T('Ex. 77 123 45 67')+'">';
     if(p.n>1)h+='<p class="tlb-mu">'+T('Groupe : une seule personne paie pour tous et envoie les identifiants de chacun.')+'</p><label class="tlb-l" for="tlb-ids">'+T('Identifiants des autres personnes (un par ligne)')+'</label><textarea id="tlb-ids" class="tlb-in" rows="3" spellcheck="false" autocomplete="off"></textarea><p class="tlb-mu">'+T(vous('Facultatif : tu pourras aussi les envoyer plus tard.','Facultatif : vous pourrez aussi les envoyer plus tard.'))+'</p>';
-    h+='<p class="tlb-er" id="tlb-er"></p><button type="button" class="tlb-go" onclick="TLBUY.send()">'+(S.m==='cash'?T('Envoyer ma demande (paiement en espèces)'):T('J’ai payé : envoyer ma demande'))+'</button>';
+    h+='<p class="tlb-er" id="tlb-er"></p><button type="button" class="tlb-go" onclick="TLBUY.send()">'+(S.m==='cash'?T('💬 Envoyer ma demande (paiement en espèces)'):T('✅ J’ai payé : envoyer ma demande'))+'</button>';
     h+='<p class="tlb-mu">'+T(vous('Ton code arrive sur WhatsApp dès que le paiement est vérifié. Colle-le ensuite ci-dessous.','Votre code arrive sur WhatsApp dès que le paiement est vérifié. Collez-le ensuite ci-dessous.'))+'</p>';
     return h}
-  function inner(){return '<p class="tlb-h">'+T('Acheter {app}',{app:esc(C.app)})+'</p><div id="tlb-b">'+body()+'</div>'}
+  function inner(){return '<p class="tlb-h">'+T('🛒 Acheter {app}',{app:esc(C.app)})+'</p><div id="tlb-b">'+body()+'</div>'}
   function html(){return '<div class="tlb" id="tlb" data-notr>'+inner()+'</div>'}
   function keep(){var a=document.getElementById('tlb-ph'),b=document.getElementById('tlb-ids');return [a?a.value:null,b?b.value:null]}
   function redraw(){var k=keep(),el=document.getElementById('tlb');if(!el)return;el.innerHTML=inner();var a=document.getElementById('tlb-ph'),b=document.getElementById('tlb-ids');if(a&&k[0]!=null)a.value=k[0];if(b&&k[1]!=null)b.value=k[1]}
@@ -1962,10 +2124,10 @@ function renderLock(err = '') {
   document.body.classList.add('locked');
   if (!ti.started && !isActivated() && !TLW_FULL) { $('#lock').innerHTML = tlwHTML({accent:'#0f766e',icon:'icon-192.png?v=tl2',name:'Budget Flow',by:'par Thousand Labs',l1:'Maîtrisez votre argent,',l2:'jour après jour.',sub:'Budget, dépenses, épargne et petits projets. 100 % privé, même sans Internet.',prev:'<div class="tlw-ph"><span>Octobre</span><span>Exemple</span></div><div class="tlw-big">Solde : 84 500 F</div><div class="tlw-row"><span><b>Loyer</b><div class="tlw-bar"><i style="width:100%"></i></div></span><b>35 000 F</b></div><div class="tlw-row"><span><b>Woyofal</b><div class="tlw-bar"><i style="width:80%"></i></div></span><b>8 000 F</b></div><div class="tlw-row"><span><b>Nourriture</b><div class="tlw-bar"><i style="width:72%"></i></div></span><b>21 500 F</b></div>',feats:[['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>','Journal des dépenses','Chaque franc noté, avec des enveloppes par poste'],['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>','Mode survie','Combien de jours pouvez-vous tenir ?'],['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>','Sans inscription','100 % privé, tout reste sur votre téléphone']],cta:'Essayer gratuitement 48 h',start:'trial-start',price:'Puis 10 000 F, une seule fois',have:'J’ai déjà un code',full:'lock-full',sw:TLL.switcher()}); return; }
   const trialHtml = ti.active
-    ? `<div class="alert alert-amber"><span class="a-ic"></span><span>Essai gratuit en cours : il reste ${fmtLeft(ti.left)}</span></div><button type="button" class="btn btn-block" data-action="trial-back">← Continuer l'essai gratuit</button>`
+    ? `<div class="alert alert-amber"><span class="a-ic">🎁</span><span>Essai gratuit en cours : il reste ${fmtLeft(ti.left)}</span></div><button type="button" class="btn btn-block" data-action="trial-back">← Continuer l'essai gratuit</button>`
     : ti.started
       ? ''
-      : `<div class="trial-box"><b>Essayez gratuitement pendant 48 h</b><span class="hint">Accès complet, sans paiement ni engagement. Ensuite, un code d'activation sera demandé ; vos données seront conservées.</span><button type="button" class="btn btn-primary btn-block" data-action="trial-start">Commencer l'essai gratuit</button></div>`;
+      : `<div class="trial-box"><b>🎁 Essayez gratuitement pendant 48 h</b><span class="hint">Accès complet, sans paiement ni engagement. Ensuite, un code d'activation sera demandé ; vos données seront conservées.</span><button type="button" class="btn btn-primary btn-block" data-action="trial-start">Commencer l'essai gratuit</button></div>`;
   const msg = `Bonjour, je souhaite obtenir Budget Flow (${PRICE}). Mon code appareil : ${lic.dev}`;
   $('#lock').innerHTML = `<div class="lock-wrap"><div class="lock-card ${err ? 'shake' : ''}">
     <div><div class="brand" style="padding:0 0 4px"><div class="brand-logo">${BRANDMARK}</div>Budget Flow</div><p class="hint">par ${TEAM}</p></div>
@@ -1976,7 +2138,7 @@ function renderLock(err = '') {
       ${field("Code d'activation", `<textarea class="input code-area" name="code" rows="3" placeholder="Collez ici le code reçu (tout le texte)" autocomplete="off" spellcheck="false" required></textarea>`)}
       ${err ? `<div class="alert alert-red">${err}</div>` : ''}
       <button class="btn btn-primary btn-block">Activer Budget Flow</button>
-      <button type="button" class="btn btn-block" data-action="lock-scan">Scanner le code du vendeur</button>
+      <button type="button" class="btn btn-block" data-action="lock-scan">📷 Scanner le code du vendeur</button>
     </form>
     <div class="dev-box"><span class="label">Code de ce téléphone</span><div class="dev-id">${lic.dev}</div><div class="flex" style="gap:8px;justify-content:center"><button class="btn btn-sm" data-action="lock-copy">Copier</button><button class="btn btn-sm" data-action="lock-qr">QR code</button></div><span class="hint">Vous avez acheté auprès d'un vendeur ? Envoyez-lui ce code.</span></div>
     ${!ti.started ? `<div style="text-align:center"><button class="link-btn" data-action="lock-welcome">← Retour à la présentation</button></div>` : ''}
@@ -1990,14 +2152,14 @@ function renderLock(err = '') {
 let installPrompt = null;
 const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const installBtn = (cls = 'btn btn-sm') => isStandalone() ? '' : `<button class="${cls}" data-action="install">Installer l'application</button>`;
+const installBtn = (cls = 'btn btn-sm') => isStandalone() ? '' : `<button class="${cls}" data-action="install">📲 Installer l'application</button>`;
 const INSTALL_HELP = `
   <div class="guide-body" style="padding:0">
-    <p><b>Android (Chrome)</b></p>
+    <p><b>📱 Android (Chrome)</b></p>
     <ol><li>Touchez le menu <b>⋮</b> en haut à droite.</li><li>Choisissez <b>« Installer l'application »</b> ou <b>« Ajouter à l'écran d'accueil »</b>.</li></ol>
-    <p style="margin-top:12px"><b>iPhone / iPad (Safari)</b></p>
+    <p style="margin-top:12px"><b>🍏 iPhone / iPad (Safari)</b></p>
     <ol><li>Touchez le bouton <b>Partager</b> (carré avec une flèche).</li><li>Choisissez <b>« Sur l'écran d'accueil »</b>, puis <b>Ajouter</b>.</li></ol>
-    <p style="margin-top:12px"><b>Ordinateur (Chrome, Edge)</b></p>
+    <p style="margin-top:12px"><b>💻 Ordinateur (Chrome, Edge)</b></p>
     <ol><li>Cliquez sur l'icône d'installation à droite de la barre d'adresse.</li></ol>
     <div class="alert alert-amber" style="margin-top:14px">Sur iPhone, installez l'appli <b>avant</b> de l'activer, puis ouvrez-la depuis son icône : l'iPhone sépare Safari et les applis installées.</div>
   </div>`;
@@ -2154,24 +2316,24 @@ function spendChart() {
   const type = D.settings.chartType === 'bars' ? 'bars' : 'pie';
   const isCur = mk === curMonth(), endOfMonth = !isCur || parseD(today()).getDate() >= 25;
   let cats = Object.entries(ms.byCat).map(([id, v]) => ({c: catById(id), v, id})).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
-  if (cats.length > 6) { const rest = cats.slice(5); cats = cats.slice(0, 5).concat([{c: {icon: '', name: 'Autres (' + rest.length + ')'}, v: sum(rest, x => x.v), id: '_other'}]); }
+  if (cats.length > 6) { const rest = cats.slice(5); cats = cats.slice(0, 5).concat([{c: {icon: '➕', name: 'Autres (' + rest.length + ')'}, v: sum(rest, x => x.v), id: '_other'}]); }
   const max = cats.length ? cats[0].v : 0;
-  const tog = `<div class="seg2 no-print"><button class="${type === 'pie' ? 'on' : ''}" data-action="chart-type" data-id="pie">Camembert</button><button class="${type === 'bars' ? 'on' : ''}" data-action="chart-type" data-id="bars">Barres</button></div>`;
+  const tog = `<div class="seg2 no-print"><button class="${type === 'pie' ? 'on' : ''}" data-action="chart-type" data-id="pie">🍩 Camembert</button><button class="${type === 'bars' ? 'on' : ''}" data-action="chart-type" data-id="bars">📊 Barres</button></div>`;
   let body;
   if (!ms.exp) body = empty('Aucune dépense en ' + monthLabel(mk) + '.');
-  else if (type === 'pie') body = `<div class="donut-wrap mt">${donut(cats, ms.exp)}<div class="legend">${cats.map((x, i) => `<div class="row"><span class="dot" style="background:${COLORS[i % COLORS.length]}"></span><span class="nm">${esc(x.c.name)}</span><b>${Math.round(x.v / ms.exp * 100)} %</b><span class="muted" style="min-width:76px;text-align:right">${fmt(x.v)}</span></div>`).join('')}</div></div>`;
-  else body = `<div class="cbars mt">${cats.map((x, i) => `<div class="cbar"><div class="top"><span class="nm">${esc(x.c.name)}</span><span><b>${fmt(x.v)}</b> <span class="muted">· ${Math.round(x.v / ms.exp * 100)} %</span></span></div><div class="trk"><i style="width:${(x.v / max * 100).toFixed(1)}%;background:${COLORS[i % COLORS.length]}"></i></div></div>`).join('')}</div>`;
+  else if (type === 'pie') body = `<div class="donut-wrap mt">${donut(cats, ms.exp)}<div class="legend">${cats.map((x, i) => `<div class="row"><span class="dot" style="background:${COLORS[i % COLORS.length]}"></span><span class="nm">${x.c.icon} ${esc(x.c.name)}</span><b>${Math.round(x.v / ms.exp * 100)} %</b><span class="muted" style="min-width:76px;text-align:right">${fmt(x.v)}</span></div>`).join('')}</div></div>`;
+  else body = `<div class="cbars mt">${cats.map((x, i) => `<div class="cbar"><div class="top"><span class="nm">${x.c.icon} ${esc(x.c.name)}</span><span><b>${fmt(x.v)}</b> <span class="muted">· ${Math.round(x.v / ms.exp * 100)} %</span></span></div><div class="trk"><i style="width:${(x.v / max * 100).toFixed(1)}%;background:${COLORS[i % COLORS.length]}"></i></div></div>`).join('')}</div>`;
   // Repères pour ajuster le mois suivant
   const tips = [];
   if (ms.exp && cats.length) {
     const t = cats[0], pv = t.id !== '_other' ? (prev.byCat[t.id] || 0) : 0;
-    tips.push(`<b>${esc(t.c.name)}</b> est votre 1er poste : ${Math.round(t.v / ms.exp * 100)} % des dépenses` + (pv ? (Math.round((t.v - pv) / pv * 100) === 0 ? ` (stable vs ${MONTHS[parseD(shiftMonth(mk, -1) + '-01').getMonth()]})` : ` (${t.v >= pv ? '+' : ''}${Math.round((t.v - pv) / pv * 100)} % vs ${MONTHS[parseD(shiftMonth(mk, -1) + '-01').getMonth()]})`) : '') + '.');
+    tips.push(`${t.c.icon} <b>${esc(t.c.name)}</b> est votre 1er poste : ${Math.round(t.v / ms.exp * 100)} % des dépenses` + (pv ? (Math.round((t.v - pv) / pv * 100) === 0 ? ` (stable vs ${MONTHS[parseD(shiftMonth(mk, -1) + '-01').getMonth()]})` : ` (${t.v >= pv ? '+' : ''}${Math.round((t.v - pv) / pv * 100)} % vs ${MONTHS[parseD(shiftMonth(mk, -1) + '-01').getMonth()]})`) : '') + '.');
     const over = D.categories.filter(c => c.budget > 0 && (ms.byCat[c.id] || 0) > c.budget);
-    if (over.length) tips.push('Budget dépassé : ' + over.slice(0, 3).map(c => `${esc(c.name)} (+${fmt((ms.byCat[c.id] || 0) - c.budget)})`).join(', ') + '. Ajustez ces enveloppes ou ces habitudes le mois prochain.');
-    if (prev.exp) { const d = (ms.exp - prev.exp) / prev.exp * 100; if (Math.abs(d) >= 5) tips.push(`${d > 0 ? '' : ''} Total ${d > 0 ? 'en hausse' : 'en baisse'} de ${Math.abs(Math.round(d))} % par rapport au mois précédent.`); }
+    if (over.length) tips.push('⚠️ Budget dépassé : ' + over.slice(0, 3).map(c => `${c.icon} ${esc(c.name)} (+${fmt((ms.byCat[c.id] || 0) - c.budget)})`).join(', ') + '. Ajustez ces enveloppes ou ces habitudes le mois prochain.');
+    if (prev.exp) { const d = (ms.exp - prev.exp) / prev.exp * 100; if (Math.abs(d) >= 5) tips.push(`${d > 0 ? '📈' : '📉'} Total ${d > 0 ? 'en hausse' : 'en baisse'} de ${Math.abs(Math.round(d))} % par rapport au mois précédent.`); }
   }
   return `<div class="card mt2">
-    <div class="card-head" style="flex-wrap:wrap;gap:8px"><h2>${endOfMonth ? 'Bilan de fin de mois' : 'Où est parti mon argent ?'}</h2>${tog}</div>
+    <div class="card-head" style="flex-wrap:wrap;gap:8px"><h2>📊 ${endOfMonth ? 'Bilan de fin de mois' : 'Où est parti mon argent ?'}</h2>${tog}</div>
     ${monthNav(mk, 'cm-prev', 'cm-next')}
     ${ms.exp ? `<p class="sub mt-s">${fmt(ms.exp)} dépensés en ${monthLabel(mk)} · ${ms.count} opération(s)</p>` : ''}
     ${body}
@@ -2183,19 +2345,19 @@ function spendChart() {
 /* ---------- Bascule entre portefeuilles ---------- */
 function walletBar() {
   const w = curWallet();
-  return `<div class="wbar no-print"><button class="wpill" data-action="wallets" aria-label="Changer de portefeuille"><span class="nm">${esc(w.name)}</span><small>${w.kind === 'pro' ? 'Pro' : 'Perso'}</small><span aria-hidden="true">▾</span></button>${multiW() ? '' : '<span class="hint">Un commerce ou un projet à suivre à part ? Touchez le portefeuille.</span>'}</div>`;
+  return `<div class="wbar no-print"><button class="wpill" data-action="wallets" aria-label="Changer de portefeuille"><span>${w.icon}</span><span class="nm">${esc(w.name)}</span><small>${w.kind === 'pro' ? 'Pro' : 'Perso'}</small><span aria-hidden="true">▾</span></button>${multiW() ? '' : '<span class="hint">Un commerce ou un projet à suivre à part ? Touchez le portefeuille.</span>'}</div>`;
 }
 function walletsModal() {
   openModal('Mes portefeuilles', `<p class="sub">Chaque portefeuille a son propre solde, ses dépenses, ses budgets et son mode survie. Rien ne se mélange.</p>
-    <div class="wlist mt">${W.list.map(x => `<button class="witem ${x.id === W.active ? 'on' : ''}" data-action="wallet-switch" data-id="${x.id}"><span class="ic">${mono(x.name)}</span><span class="gr"><b>${esc(x.name)}</b><small>${x.kind === 'pro' ? 'Commerce / projet' : 'Argent personnel'}${x.id === W.active ? ' · actif' : ''}</small></span>${x.id === W.active ? '✓' : ''}</button>`).join('')}</div>
-    <form data-form="wallet-new" class="card mt" style="padding:14px"><h3 style="margin:0 0 6px">Nouveau portefeuille</h3>
+    <div class="wlist mt">${W.list.map(x => `<button class="witem ${x.id === W.active ? 'on' : ''}" data-action="wallet-switch" data-id="${x.id}"><span class="ic">${x.icon}</span><span class="gr"><b>${esc(x.name)}</b><small>${x.kind === 'pro' ? 'Commerce / projet' : 'Argent personnel'}${x.id === W.active ? ' · actif' : ''}</small></span>${x.id === W.active ? '✓' : ''}</button>`).join('')}</div>
+    <form data-form="wallet-new" class="card mt" style="padding:14px"><h3 style="margin:0 0 6px">➕ Nouveau portefeuille</h3>
       ${field('Nom', '<input class="input" name="name" required maxlength="30" placeholder="Ex : Ma boutique, Business Wax, Projet T-shirts">')}
-      ${field('Type', '<select class="input" name="kind"><option value="pro">Commerce / projet (catégories pro)</option><option value="perso">Personnel</option></select>')}
+      ${field('Type', '<select class="input" name="kind"><option value="pro">🏪 Commerce / projet (catégories pro)</option><option value="perso">👤 Personnel</option></select>')}
       <button class="btn btn-primary btn-block mt-s">Créer et ouvrir</button></form>
-    <div class="card mt" style="padding:14px"><h3 style="margin:0 0 8px">Portefeuille actif</h3>
+    <div class="card mt" style="padding:14px"><h3 style="margin:0 0 8px">✏️ Portefeuille actif</h3>
       <form data-form="wallet-rename" class="flex" style="gap:8px"><input class="input" name="name" required maxlength="30" value="${esc(curWallet().name)}"><button class="btn">Renommer</button></form>
-      ${W.active !== 'main' ? `<button class="btn btn-block mt" style="color:var(--red)" data-action="wallet-delete">Supprimer ce portefeuille</button>` : ''}
-      <p class="hint mt-s">La sauvegarde (Réglages) concerne le portefeuille actif : faites-en une par portefeuille.</p></div>`);
+      ${W.active !== 'main' ? `<button class="btn btn-block mt" style="color:var(--red)" data-action="wallet-delete">🗑️ Supprimer ce portefeuille</button>` : ''}
+      <p class="hint mt-s">💾 La sauvegarde (Réglages) concerne le portefeuille actif : faites-en une par portefeuille.</p></div>`);
 }
 function switchWallet(id) {
   if (id === W.active || !W.list.some(x => x.id === id)) return closeModal();
@@ -2222,7 +2384,7 @@ views.dash = () => {
   ${head(capFirst(dateDay(today())), 'Tableau de bord', '', `<button class="btn btn-primary hide-m" data-action="quick-expense">${icon('plus', 18)} Dépense</button>`)}
   ${isNew ? `
   <div class="card mt" style="border:2px dashed var(--primary);margin-bottom:16px">
-    <h2>Bienvenue sur Budget Flow</h2>
+    <h2>Bienvenue sur Budget Flow 👋</h2>
     <p class="sub mt-s">Trois étapes pour démarrer. Vos données restent sur cet appareil.</p>
     <div class="stack mt">
       <div class="flex between wrap"><span><b>1.</b> Indiquer l'argent dont vous disposez aujourd'hui</span><button class="btn btn-sm btn-primary" data-action="set-initial">Saisir mon solde</button></div>
@@ -2235,7 +2397,7 @@ views.dash = () => {
     <div class="card hero">
       <div class="k">Solde disponible</div>
       <div class="big mt ${t.balance < 0 ? 'neg' : ''}">${fmt(t.balance)}</div>
-      <div class="hero-row">${!isSimple() || t.em ? `<span>Secours : <b>${fmt(t.em)}</b></span>` : ''}<span>Objectifs : <b>${fmt(t.gl)}</b></span></div>
+      <div class="hero-row">${!isSimple() || t.em ? `<span>🛡️ Secours : <b>${fmt(t.em)}</b></span>` : ''}<span>🎯 Objectifs : <b>${fmt(t.gl)}</b></span></div>
       <div class="hero-foot">Patrimoine total : <b>${fmt(t.balance + t.em + t.gl)}</b></div>
     </div>
     ${isSimple() ? '' : survivalCard(sv)}
@@ -2252,7 +2414,7 @@ views.dash = () => {
       <div class="card-head"><h2>Enveloppes du mois</h2><button class="btn btn-sm" data-action="go" data-id="sorties">Tout voir</button></div>
       ${env.length ? env.map(({c, sp}) => {
         const p = sp / c.budget * 100;
-        return `<div style="margin-bottom:12px"><div class="flex between" style="font-size:13.5px"><span>${esc(c.name)}</span><span class="${p > 100 ? 'neg' : 'muted'}">${fmt(sp)} / ${fmt(c.budget)}</span></div><div class="mt-s">${progress(p, levelCls(p))}</div></div>`;
+        return `<div style="margin-bottom:12px"><div class="flex between" style="font-size:13.5px"><span>${c.icon} ${esc(c.name)}</span><span class="${p > 100 ? 'neg' : 'muted'}">${fmt(sp)} / ${fmt(c.budget)}</span></div><div class="mt-s">${progress(p, levelCls(p))}</div></div>`;
       }).join('') : empty('Aucun budget défini. Fixez vos enveloppes dans « Sorties ».')}
     </div>
     <div class="card">
@@ -2280,7 +2442,7 @@ function survivalCard(sv) {
     <div class="mt">${progress(d / 60 * 100, d < 7 ? 'bad' : d < 30 ? 'mid' : 'ok')}</div>
     <p class="surv-msg mt">${lv[2]}</p>
     <div class="surv-meta">Rythme ${sv.b.source === 'réel' ? 'réel' : 'budgété'} : <b>${fmt(sv.b.daily)}/jour</b>${sv.bal > 0 ? ` · Solde à zéro vers le <b>${dateLong(sv.end)}</b>` : ''}${sv.em > 0 ? ` · Avec la caisse de secours : <b>${sv.withEm} j</b>` : ''}</div>
-    ${reduce > 0 && d < 60 ? `<div class="surv-tip">Dépenser <b>${fmt(reduce)}</b> de moins par jour vous ferait gagner une semaine.</div>` : ''}
+    ${reduce > 0 && d < 60 ? `<div class="surv-tip">💡 Dépenser <b>${fmt(reduce)}</b> de moins par jour vous ferait gagner une semaine.</div>` : ''}
   </div>`;
 }
 
@@ -2297,7 +2459,7 @@ function getAlerts() {
     if (proj > caps.month) a.push(['amber', `À ce rythme, vos dépenses variables atteindront ~${fmt(proj)} ce mois (plafond : ${fmt(caps.month)}).`]);
   }
   D.categories.filter(c => c.budget > 0 && (ms.byCat[c.id] || 0) > c.budget)
-    .forEach(c => a.push(['amber', `${esc(c.name)} : enveloppe dépassée de ${fmt(ms.byCat[c.id] - c.budget)}.`]));
+    .forEach(c => a.push(['amber', `${c.icon} ${esc(c.name)} : enveloppe dépassée de ${fmt(ms.byCat[c.id] - c.budget)}.`]));
   const lb = D.settings.lastBackup, nData = D.expenses.length + D.incomes.length + D.sales.length + D.goals.length;
   const backupAlert = nData >= 3 && (!lb || diffDays(lb, today()) >= 7)
     ? ['amber', `<span>${lb ? 'Votre dernière sauvegarde date de plus de 7 jours.' : "Vous n'avez encore fait aucune sauvegarde."} Si vous changez de téléphone ou videz le navigateur, vos données seront perdues.</span> <button class="btn btn-sm btn-primary mt-s" data-action="export" style="text-decoration:none">Sauvegarder maintenant</button>`] : null;
@@ -2306,7 +2468,7 @@ function getAlerts() {
 
 function expenseItem(e) {
   const c = catById(e.catId);
-  return `<div class="item"><div class="item-ic">${mono(c.name)}</div>
+  return `<div class="item"><div class="item-ic">${c.icon}</div>
     <div class="item-main"><div class="item-title">${esc(e.note || c.name)}</div><div class="item-sub">${esc(c.name)} · ${dateLong(e.date)}</div></div>
     <div class="item-amt neg">−${fmt(e.amount)}</div>
     <button class="icon-btn no-print" data-action="edit-exp" data-id="${e.id}" aria-label="Modifier">${icon('edit', 16)}</button></div>`;
@@ -2330,7 +2492,7 @@ views.entrees = () => {
     <div class="section-title">Revenus réguliers <button class="btn btn-sm" data-action="add-source">${icon('plus', 15)} Source</button></div>
     <div class="card"><div class="list">${D.sources.length ? D.sources.map(s => {
       const got = D.incomes.find(x => x.sourceId === s.id && x.date.startsWith(mk));
-      return `<div class="item"><div class="item-ic">${icon('in', 18)}</div>
+      return `<div class="item"><div class="item-ic">${INCOME_IC[s.type] || '💰'}</div>
         <div class="item-main"><div class="item-title">${esc(s.label)}</div>
         <div class="item-sub">${s.currency !== 'FCFA' ? fmtCur(s.amount, s.currency) + ' → ' : ''}≈ ${fmt(incomeNet(s))} net${s.day ? ` · vers le ${s.day}` : ''}</div></div>
         ${got ? `<span class="badge b-green">✓ Reçu</span>` : `<button class="btn btn-sm btn-primary" data-action="cash-source" data-id="${s.id}">Encaisser</button>`}
@@ -2362,7 +2524,7 @@ views.entrees = () => {
     </div>
     <div class="card">
       <div class="card-head"><h2>Encaissements du mois</h2></div>
-      <div class="list">${rec.length ? rec.map(i => `<div class="item"><div class="item-ic">${icon('in', 18)}</div>
+      <div class="list">${rec.length ? rec.map(i => `<div class="item"><div class="item-ic">${INCOME_IC[i.type] || '💰'}</div>
         <div class="item-main"><div class="item-title">${esc(i.label)}</div><div class="item-sub">${dateLong(i.date)}${i.currency !== 'FCFA' ? ' · ' + fmtCur(i.amount, i.currency) : ''}${incomeGross(i) - incomeNet(i) > 0 ? ' · frais ' + fmt(incomeGross(i) - incomeNet(i)) : ''}</div></div>
         <div class="item-amt pos">+${fmt(incomeNet(i))}</div>
         <button class="icon-btn" data-action="edit-income" data-id="${i.id}">${icon('edit', 16)}</button></div>`).join('') : empty('Aucun revenu encaissé ce mois-ci.')}</div>
@@ -2430,7 +2592,7 @@ function catRow(c, ms) {
   const sp = ms.byCat[c.id] || 0, b = c.budget, p = b ? sp / b * 100 : 0;
   const paid = c.kind === 'fixe' && b > 0 && sp >= b;
   return `<div class="item">
-    <div class="item-ic">${mono(c.name)}</div>
+    <div class="item-ic">${c.icon}</div>
     <div class="item-main"><div class="item-title">${esc(c.name)}</div>
       <div class="item-sub">${fmt(sp)}${b ? ` sur ${fmt(b)} · ${sp > b ? `<span class="neg">dépassé de ${fmt(sp - b)}</span>` : `reste ${fmt(b - sp)}`}` : ' · pas de budget'}</div>
       ${b ? `<div class="mt-s">${progress(p, levelCls(p))}</div>` : ''}</div>
@@ -2447,7 +2609,7 @@ views.journal = () => `
       <div class="flex between wrap" style="gap:10px;margin-bottom:10px">
         ${monthNav(state.journalMonth, 'jm-prev', 'jm-next')}
         <div class="flex" style="flex:1;min-width:220px">
-          <select class="input" data-live="jcat" style="height:38px;font-size:14px"><option value="">Toutes catégories</option>${D.categories.map(c => `<option value="${c.id}" ${state.jcat === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+          <select class="input" data-live="jcat" style="height:38px;font-size:14px"><option value="">Toutes catégories</option>${D.categories.map(c => `<option value="${c.id}" ${state.jcat === c.id ? 'selected' : ''}>${c.icon} ${esc(c.name)}</option>`).join('')}</select>
           <input class="input" data-live="jq" placeholder="Rechercher…" value="${esc(state.jq)}" style="height:38px;font-size:14px">
         </div>
       </div>
@@ -2468,7 +2630,7 @@ function journalList() {
     Object.keys(days).map(d => `<div class="day-head"><span>${dateDay(d)}</span><span>−${fmt(sum(days[d], e => e.amount))}</span></div>
       <div class="list">${days[d].map(e => {
         const c = catById(e.catId);
-        return `<div class="item"><div class="item-ic">${mono(c.name)}</div>
+        return `<div class="item"><div class="item-ic">${c.icon}</div>
           <div class="item-main"><div class="item-title">${esc(e.note || c.name)}</div><div class="item-sub">${esc(c.name)}</div></div>
           <div class="item-amt neg">−${fmt(e.amount)}</div>
           <button class="icon-btn" data-action="edit-exp" data-id="${e.id}">${icon('edit', 16)}</button>
@@ -2481,7 +2643,7 @@ function expenseForm(e = {}) {
   return `<form data-form="expense" class="stack" autocomplete="off">
     <input type="hidden" name="id" value="${e.id || ''}"><input type="hidden" name="fromScenario" value="${e.fromScenario || ''}">
     ${field('Montant (FCFA)', amountInput('amount', e.amount, 'class="input input-xl" placeholder="0" required').replace('class="input" ', ''))}
-    <div class="field"><span class="label">Catégorie</span><div class="chips">${D.categories.map(c => `<label class="chip"><input type="radio" name="catId" value="${c.id}" ${sel === c.id ? 'checked' : ''}><span>${esc(c.name)}</span></label>`).join('')}</div></div>
+    <div class="field"><span class="label">Catégorie</span><div class="chips">${D.categories.map(c => `<label class="chip"><input type="radio" name="catId" value="${c.id}" ${sel === c.id ? 'checked' : ''}><span>${c.icon} ${esc(c.name)}</span></label>`).join('')}</div></div>
     <div class="row2">
       ${field('Note', `<input class="input" name="note" maxlength="80" placeholder="Ex : déjeuner, taxi…" value="${esc(e.note || '')}">`)}
       ${field('Date', `<input class="input" type="date" name="date" value="${e.date || today()}" required>`)}
@@ -2505,7 +2667,7 @@ views.proj = () => {
     if (!cap) return `<div class="kv"><span>${label}</span><span><b>${fmt(sp)}</b> <span class="muted">· sans plafond</span></span></div>`;
     const p = sp / cap * 100;
     return `<div style="padding:8px 0"><div class="flex between" style="font-size:14px"><span>${label}</span><span><b class="${p > 100 ? 'neg' : ''}">${fmt(sp)}</b> / ${fmt(cap)}</span></div>
-      <div class="mt-s">${progress(p, levelCls(p))}</div><div class="hint mt-s">${p > 100 ? `<span class="neg">Dépassé de ${fmt(sp - cap)}</span>` : `Reste ${fmt(cap - sp)} ${hint}`}</div></div>`;
+      <div class="mt-s">${progress(p, levelCls(p))}</div><div class="hint mt-s">${p > 100 ? `<span class="neg">⚠️ Dépassé de ${fmt(sp - cap)}</span>` : `Reste ${fmt(cap - sp)} ${hint}`}</div></div>`;
   };
   return `
   ${head('Module 4', 'Projections', 'Vos habitudes converties en jour, semaine, mois et année, avec des plafonds d’alerte.')}
@@ -2619,10 +2781,10 @@ function simVerdict(a) {
   const daysEq = s.daily > 0 ? a / s.daily : 0;
   let v;
   if (!a) v = ['blue', 'Saisissez un montant pour obtenir un verdict.'];
-  else if (after < 0) v = ['red', `Déconseillé : il vous manquerait ${fmt(-after)} en fin de mois.${em >= -after ? ' La caisse de secours pourrait couvrir, mais elle est réservée aux urgences.' : ''}`];
-  else if (after < s.daily * 7) v = ['red', `Risqué : il ne resterait que ${fmt(after)}, moins d'une semaine de dépenses.`];
+  else if (after < 0) v = ['red', `❌ Déconseillé : il vous manquerait ${fmt(-after)} en fin de mois.${em >= -after ? ' La caisse de secours pourrait couvrir, mais elle est réservée aux urgences.' : ''}`];
+  else if (after < s.daily * 7) v = ['red', `⚠️ Risqué : il ne resterait que ${fmt(after)}, moins d'une semaine de dépenses.`];
   else if (after < s.daily * 15) v = ['amber', `Faisable mais tendu : il resterait ${fmt(after)} en fin de mois.`];
-  else v = ['green', `Faisable : il resterait ${fmt(after)} en fin de mois.`];
+  else v = ['green', `✅ Faisable : il resterait ${fmt(after)} en fin de mois.`];
   return `<div class="alert alert-${v[0]}">${v[1]}</div>
     ${a ? `<div class="mt"><div class="kv"><span>Fin de mois après achat</span><b class="${after < 0 ? 'neg' : ''}">${fmt(after)}</b></div>
     <div class="kv"><span>Cet achat équivaut à</span><b>${daysEq.toFixed(1).replace('.', ',')} jour(s) d'autonomie</b></div>
@@ -2638,7 +2800,7 @@ views.secours = () => {
   ${head('Module 6', 'Caisse de secours', 'Épargne d’urgence, isolée de votre solde courant.')}
   <div class="grid g2">
     <div class="card vault">
-      <div class="flex between"><span class="k">Caisse de secours</span><span class="badge vault-badge">Isolée</span></div>
+      <div class="flex between"><span class="k">🛡️ Caisse de secours</span><span class="badge vault-badge">🔒 Isolée</span></div>
       <div class="big mt">${fmt(bal)}</div>
       <div class="vault-sub mt-s">Couvre environ <b>${cover} jour(s)</b> de dépenses au rythme actuel.</div>
       ${target ? `<div class="mt">${progress(p)}</div><div class="vault-sub mt-s">${Math.round(p)} % de l'objectif : ${m} mois = ${fmt(target)}</div>` : ''}
@@ -2659,7 +2821,7 @@ views.secours = () => {
     </div>
   </div>
   <div class="section"><div class="section-title">Historique</div>
-    <div class="card"><div class="list">${hist.length ? hist.map(h => `<div class="item"><div class="item-ic">${icon(h.amount > 0 ? 'in' : 'out', 18)}</div>
+    <div class="card"><div class="list">${hist.length ? hist.map(h => `<div class="item"><div class="item-ic">${h.amount > 0 ? '⬆️' : '⬇️'}</div>
       <div class="item-main"><div class="item-title">${esc(h.note || (h.amount > 0 ? 'Versement' : 'Retrait'))}</div><div class="item-sub">${dateLong(h.date)}</div></div>
       <div class="item-amt ${h.amount > 0 ? 'pos' : 'neg'}">${h.amount > 0 ? '+' : '−'}${fmt(Math.abs(h.amount))}</div>
       <button class="icon-btn" data-action="em-del" data-id="${h.id}">${icon('trash', 16)}</button></div>`).join('') : empty('Aucun mouvement. Commencez petit : même 1 000 F par semaine comptent.')}</div></div>
@@ -2682,8 +2844,8 @@ function goalCard(g) {
       plan = `Pour le ${dateLong(g.deadline)} : <b>${fmt(perM)}/mois</b> (${fmt(rest / days * 7)}/semaine)`; }
   }
   return `<div class="card">
-    <div class="card-head"><div class="flex"><div class="item-ic">${icon('target', 18)}</div><div><h2>${esc(g.name)}</h2><div class="item-sub">Cible : ${fmt(g.target)}</div></div></div>
-      ${done ? '<span class="badge b-green">Atteint</span>' : `<span class="badge b-violet">${Math.round(p)} %</span>`}</div>
+    <div class="card-head"><div class="flex"><div class="item-ic">${g.icon || '🎯'}</div><div><h2>${esc(g.name)}</h2><div class="item-sub">Cible : ${fmt(g.target)}</div></div></div>
+      ${done ? '<span class="badge b-green">🎉 Atteint</span>' : `<span class="badge b-violet">${Math.round(p)} %</span>`}</div>
     <div class="big-s">${fmt(s)}</div>
     <div class="mt-s">${progress(p, done ? 'ok' : '')}</div>
     <div class="hint mt-s">${done ? 'Objectif atteint, bravo !' : `Reste ${fmt(rest)}`}</div>
@@ -2716,7 +2878,7 @@ views.bilan = () => {
     <div class="card">
       <h2>Répartition des dépenses</h2>
       ${ms.exp ? `<div class="donut-wrap mt">${donut(cats, ms.exp)}
-        <div class="legend">${cats.map((x, i) => `<div class="row"><span class="dot" style="background:${COLORS[i % COLORS.length]}"></span><span class="nm">${esc(x.c.name)}</span><b>${Math.round(x.v / ms.exp * 100)} %</b><span class="muted" style="min-width:76px;text-align:right">${fmt(x.v)}</span></div>`).join('')}</div></div>
+        <div class="legend">${cats.map((x, i) => `<div class="row"><span class="dot" style="background:${COLORS[i % COLORS.length]}"></span><span class="nm">${x.c.icon} ${esc(x.c.name)}</span><b>${Math.round(x.v / ms.exp * 100)} %</b><span class="muted" style="min-width:76px;text-align:right">${fmt(x.v)}</span></div>`).join('')}</div></div>
         <div class="mt2"><div class="flex between" style="font-size:13px"><span>Fixes ${Math.round(ms.fixed / ms.exp * 100)} %</span><span>Variables ${Math.round(ms.variable / ms.exp * 100)} %</span></div>
         <div class="stackbar mt-s"><span style="width:${ms.fixed / ms.exp * 100}%;background:var(--blue)"></span><span style="width:${ms.variable / ms.exp * 100}%;background:var(--amber)"></span></div></div>`
         : empty('Aucune dépense ce mois-ci.')}
@@ -2731,7 +2893,7 @@ views.bilan = () => {
       <h2>Budget vs réel</h2>
       <div class="scroll-x mt"><table class="tbl"><thead><tr><th>Catégorie</th><th class="r">Budget</th><th class="r">Réel</th><th class="r">Écart</th></tr></thead><tbody>
       ${budgeted.length ? budgeted.map(c => { const r = ms.byCat[c.id] || 0, d = c.budget - r;
-        return `<tr><td>${esc(c.name)}</td><td class="r">${c.budget ? fmt(c.budget) : '—'}</td><td class="r">${fmt(r)}</td><td class="r ${c.budget ? (d < 0 ? 'neg' : 'pos') : 'muted'}">${c.budget ? (d >= 0 ? '+' : '') + fmt(d) : '—'}</td></tr>`; }).join('')
+        return `<tr><td>${c.icon} ${esc(c.name)}</td><td class="r">${c.budget ? fmt(c.budget) : '—'}</td><td class="r">${fmt(r)}</td><td class="r ${c.budget ? (d < 0 ? 'neg' : 'pos') : 'muted'}">${c.budget ? (d >= 0 ? '+' : '') + fmt(d) : '—'}</td></tr>`; }).join('')
         : '<tr><td colspan="4" class="muted">Aucune donnée.</td></tr>'}
       </tbody></table></div>
     </div>
@@ -2759,10 +2921,10 @@ function advice(ms, prev, rate, mk) {
   else if (rate !== null && rate < 10) a.push(['amber', `Taux d'épargne de ${Math.round(rate)} %. Visez au moins 10 % le mois prochain.`]);
   else if (rate !== null && rate >= 20) a.push(['green', `Excellent : ${Math.round(rate)} % de vos entrées n'ont pas été dépensées.`]);
   const vars = D.categories.filter(c => c.kind !== 'fixe').map(c => ({c, v: ms.byCat[c.id] || 0})).sort((x, y) => y.v - x.v);
-  if (ms.exp && vars[0] && vars[0].v / ms.exp > 0.35) a.push(['amber', `${esc(vars[0].c.name)} pèse ${Math.round(vars[0].v / ms.exp * 100)} % de vos dépenses : c'est votre premier levier d'économie.`]);
-  D.categories.filter(c => c.budget > 0 && (ms.byCat[c.id] || 0) > c.budget).forEach(c => a.push(['red', `${esc(c.name)} : dépassement de ${fmt(ms.byCat[c.id] - c.budget)}. Ajustez le budget ou la consommation.`]));
+  if (ms.exp && vars[0] && vars[0].v / ms.exp > 0.35) a.push(['amber', `${vars[0].c.icon} ${esc(vars[0].c.name)} pèse ${Math.round(vars[0].v / ms.exp * 100)} % de vos dépenses : c'est votre premier levier d'économie.`]);
+  D.categories.filter(c => c.budget > 0 && (ms.byCat[c.id] || 0) > c.budget).forEach(c => a.push(['red', `${c.icon} ${esc(c.name)} : dépassement de ${fmt(ms.byCat[c.id] - c.budget)}. Ajustez le budget ou la consommation.`]));
   if (mk < curMonth()) D.categories.filter(c => c.kind !== 'fixe' && c.budget > 0 && (ms.byCat[c.id] || 0) < c.budget * 0.5)
-    .slice(0, 2).forEach(c => a.push(['blue', `${esc(c.name)} : moins de la moitié du budget utilisée. Budget à réduire au profit de l'épargne ?`]));
+    .slice(0, 2).forEach(c => a.push(['blue', `${c.icon} ${esc(c.name)} : moins de la moitié du budget utilisée. Budget à réduire au profit de l'épargne ?`]));
   if (prev.exp && ms.exp) { const d = (ms.exp - prev.exp) / prev.exp * 100; if (Math.abs(d) >= 10) a.push([d > 0 ? 'amber' : 'green', `Dépenses ${d > 0 ? 'en hausse' : 'en baisse'} de ${Math.abs(Math.round(d))} % par rapport au mois précédent.`]); }
   const target = essentialMonthly() * D.settings.emergencyMonths;
   if (target && emergencyBalance() < target && ms.em <= 0) a.push(['blue', `Rien n'a été versé dans la caisse de secours ce mois-ci. Même un petit montant régulier compte.`]);
@@ -2772,17 +2934,17 @@ function advice(ms, prev, rate, mk) {
 
 /* ---------- GUIDE D'UTILISATION ---------- */
 const GUIDE = [
-  ['Installer l\'application', `<p>Budget Flow s'installe sur l'écran d'accueil comme une application classique, avec son icône, et fonctionne ensuite <b>sans Internet</b>.</p>${INSTALL_HELP}`],
-  ['Mode simple ou mode complet', `<p>Au premier lancement, Budget Flow vous demande comment vous voulez l'utiliser :</p>
+  ['📲 Installer l\'application', `<p>Budget Flow s'installe sur l'écran d'accueil comme une application classique, avec son icône, et fonctionne ensuite <b>sans Internet</b>.</p>${INSTALL_HELP}`],
+  ['🧭 Mode simple ou mode complet', `<p>Au premier lancement, Budget Flow vous demande comment vous voulez l'utiliser :</p>
     <ul><li><b>Mode simple</b> : tableau de bord, journal, entrées, sorties et objectifs. L'essentiel pour savoir où va votre argent.</li>
     <li><b>Mode complet</b> : tout le mode simple, plus le mode survie, les projections et plafonds, le simulateur d'achat, la caisse de secours et le bilan détaillé du mois.</li></ul>
     <p>Vous pouvez changer à tout moment dans <b>Réglages → Mode d'affichage</b>. Rien n'est effacé quand vous changez de mode.</p>`],
-  ['Premiers pas (5 minutes)', `<ol>
+  ['🚀 Premiers pas (5 minutes)', `<ol>
     <li><b>Solde de départ</b> : dans Réglages, indiquez l'argent dont vous disposez aujourd'hui (espèces + mobile money + banque), hors épargne.</li>
     <li><b>Budgets</b> : dans Sorties, touchez ✎ sur chaque catégorie (loyer, Woyofal, nourriture…) et fixez un montant mensuel.</li>
     <li><b>Revenus</b> : dans Entrées, ajoutez vos revenus réguliers (bourse, salaire, aide) et vos services si vous vendez des prestations.</li>
     <li><b>Au quotidien</b> : notez chaque dépense avec le bouton <b>+</b>. C'est la seule habitude à prendre.</li></ol>`],
-  ['Comprendre le « solde disponible »', `<p>C'est l'argent que vous pouvez réellement dépenser :</p>
+  ['💰 Comprendre le « solde disponible »', `<p>C'est l'argent que vous pouvez réellement dépenser :</p>
     <p><b>solde de départ + revenus + ventes − dépenses − argent mis de côté</b></p>
     <p>L'argent placé dans la caisse de secours ou dans vos objectifs n'en fait plus partie : il est protégé.</p>`],
   ['1. Entrées & projets', `<ul>
@@ -2807,12 +2969,12 @@ const GUIDE = [
   ['8. Bilan du mois', `<p>Graphique de répartition, budget prévu contre réel, taux d'épargne, top 5 des dépenses et conseils automatiques pour le mois suivant.</p>
     <p>Naviguez entre les mois avec les flèches. « Imprimer / PDF » sauvegarde le rapport.</p>`],
   ['9. Objectifs d\'épargne', `<p>Créez une cible (ordinateur, formation…) avec un montant et une échéance. L'appli calcule combien verser chaque mois et chaque semaine pour y arriver à temps.</p>`],
-  ['Sauvegarde & changement de téléphone', `<ul>
+  ['💾 Sauvegarde & changement de téléphone', `<ul>
     <li>Vos données restent <b>uniquement sur cet appareil</b> : aucune inscription, aucun serveur.</li>
     <li>Dans Réglages, touchez <b>Exporter</b> régulièrement : vous obtenez un fichier de sauvegarde à garder (WhatsApp à vous-même, Drive…).</li>
     <li>Nouveau téléphone : ouvrez Budget Flow, demandez un nouveau code d'activation, puis <b>Importer</b> votre sauvegarde.</li>
     <li>Ouvrez toujours l'appli depuis son icône : sur iPhone, Safari et l'appli installée ne partagent pas les mêmes données.</li></ul>`],
-  ['Questions fréquentes', `<ul>
+  ['❓ Questions fréquentes', `<ul>
     <li><b>Faut-il Internet ?</b> Seulement la toute première fois, pour installer l'appli. Ensuite, tout fonctionne hors ligne.</li>
     <li><b>Mes données sont-elles visibles par quelqu'un ?</b> Non, elles ne quittent jamais votre appareil.</li>
     <li><b>Puis-je essayer avant d'acheter ?</b> Oui : sur l'écran d'activation, touchez « Commencer l'essai gratuit » pour utiliser Budget Flow pendant 48 h sans code (une seule fois par téléphone). À la fin, l'appli demande un code d'activation ; vos données sont conservées.</li>
@@ -2876,15 +3038,15 @@ views.reglages = () => {
       <p class="hint mt-s">« Tout effacer » conserve votre activation.</p>
     </div>
     <div class="card">
-      <h2>Installer l'application</h2>
+      <h2>📲 Installer l'application</h2>
       <div class="mt-s">${TLI.html("Budget Flow", 'btn btn-primary')}</div>
       <p class="hint mt">Site officiel : <a href="https://thousandlabs.github.io/Budget-Flow/" target="_blank" rel="noopener" style="color:var(--primary)">thousandlabs.github.io/Budget-Flow</a></p>
     </div>
     <div class="card">
       <h2>Licence</h2>
       <div class="mt">
-        <div class="kv"><span>Statut</span>${isActivated() ? '<span class="badge b-green">✓ Activée</span>' : '<span class="badge b-amber">Essai gratuit</span>'}</div>
-        ${isActivated() ? '' : `<div class="kv"><span>Temps restant</span><b>${fmtLeft(trialInfo().left)}</b></div><div class="mt-s"><button class="btn btn-sm btn-primary" data-action="trial-buy">Activer maintenant</button></div>`}
+        <div class="kv"><span>Statut</span>${isActivated() ? '<span class="badge b-green">✓ Activée</span>' : '<span class="badge b-amber">🎁 Essai gratuit</span>'}</div>
+        ${isActivated() ? '' : `<div class="kv"><span>Temps restant</span><b>${fmtLeft(trialInfo().left)}</b></div><div class="mt-s"><button class="btn btn-sm btn-primary" data-action="trial-buy">🔑 Activer maintenant</button></div>`}
         <div class="kv"><span>Code appareil</span><b style="font-family:ui-monospace,monospace">${getLic().dev}</b></div>
         <div class="kv"><span>Éditeur</span><b>${TEAM}</b></div>
         <div class="kv"><span>Assistance</span><a class="link-btn" href="${waLink('Bonjour, j’ai besoin d’aide avec Budget Flow.')}" target="_blank" rel="noopener">WhatsApp ${CONTACT_FMT}</a></div>
@@ -2931,7 +3093,8 @@ const serviceForm = (s = {}) => `<form data-form="service" class="stack" autocom
 </form>`;
 const catForm = (c = {}) => `<form data-form="cat" class="stack" autocomplete="off">
   <input type="hidden" name="id" value="${c.id || ''}">
-  <div>${field('Nom', `<input class="input" name="name" required maxlength="40" value="${esc(c.name || '')}">`)}</div>
+  <div class="row2" style="grid-template-columns:80px 1fr">${field('Icône', `<input class="input" name="icon" maxlength="4" value="${c.icon || '📦'}" style="text-align:center;font-size:20px">`)}
+    ${field('Nom', `<input class="input" name="name" required maxlength="40" value="${esc(c.name || '')}">`)}</div>
   <div class="row2">${field('Type', `<select class="input" name="kind"><option value="fixe" ${c.kind === 'fixe' ? 'selected' : ''}>Fixe (incompressible)</option><option value="variable" ${c.kind !== 'fixe' ? 'selected' : ''}>Variable</option></select>`)}
     ${field('Budget mensuel (F)', amountInput('budget', c.budget || '', 'placeholder="0"'))}</div>
   <button class="btn btn-primary btn-block">Enregistrer</button>
@@ -2939,7 +3102,8 @@ const catForm = (c = {}) => `<form data-form="cat" class="stack" autocomplete="o
 </form>`;
 const goalForm = (g = {}) => `<form data-form="goal" class="stack" autocomplete="off">
   <input type="hidden" name="id" value="${g.id || ''}">
-  <div>${field('Objectif', `<input class="input" name="name" required maxlength="50" value="${esc(g.name || '')}" placeholder="Ex : ordinateur, formation…">`)}</div>
+  <div class="row2" style="grid-template-columns:80px 1fr">${field('Icône', `<input class="input" name="icon" maxlength="4" value="${g.icon || '🎯'}" style="text-align:center;font-size:20px">`)}
+    ${field('Objectif', `<input class="input" name="name" required maxlength="50" value="${esc(g.name || '')}" placeholder="Ex : ordinateur, formation…">`)}</div>
   <div class="row2">${field('Montant cible (F)', amountInput('target', g.target, 'required placeholder="250000"'))}${field('Échéance (optionnel)', `<input class="input" type="date" name="deadline" value="${g.deadline || ''}">`)}</div>
   <button class="btn btn-primary btn-block">Enregistrer</button>
   ${g.id ? `<button type="button" class="btn btn-danger btn-block" data-action="del-goal" data-id="${g.id}">Supprimer l'objectif</button>` : ''}
@@ -2973,7 +3137,7 @@ const forms = {
     const d = defaultData(); if (kind === 'pro') d.categories = PRO_CATS.map(c => ({...c}));
     d.settings.theme = D.settings.theme; d.settings.mode = D.settings.mode || 'simple';
     try { localStorage.setItem(wKey(id), JSON.stringify(d)); } catch (e) { return toast('Mémoire du téléphone pleine.', 'err'); }
-    W.list.push({id, name, icon: kind === 'pro' ? '' : '', kind}); saveW(); switchWallet(id);
+    W.list.push({id, name, icon: kind === 'pro' ? '🏪' : '👤', kind}); saveW(); switchWallet(id);
   },
   'wallet-rename': v => { const name = String(v.name || '').trim().slice(0, 30); if (!name) return; curWallet().name = name; saveW(); buildNav(); closeModal(); render(); toast('Portefeuille renommé.'); },
   async activate(f) {
@@ -2996,7 +3160,7 @@ const forms = {
       D.expenses.push({id: uid(), ts: Date.now(), ...data});
       if (f.fromScenario) D.scenarios = D.scenarios.filter(s => s.id !== f.fromScenario);
       const c = catById(f.catId), sp = monthStats(data.date.slice(0, 7)).byCat[c.id] || 0;
-      if (c.budget) toast(sp > c.budget ? `${c.name} : enveloppe dépassée de ${fmt(sp - c.budget)}` : `−${fmt(amount)} · ${c.name} : reste ${fmt(c.budget - sp)}`, sp > c.budget ? 'warn' : '');
+      if (c.budget) toast(sp > c.budget ? `${c.icon} ${c.name} : enveloppe dépassée de ${fmt(sp - c.budget)}` : `−${fmt(amount)} · ${c.name} : reste ${fmt(c.budget - sp)}`, sp > c.budget ? 'warn' : '');
       else toast(`−${fmt(amount)} · solde : ${fmt(totals().balance)}`);
       const cap = D.settings.caps.day, sT = varSpentBetween(today(), today());
       if (cap && sT > cap && data.date === today()) setTimeout(() => toast(`Plafond du jour dépassé de ${fmt(sT - cap)}.`, 'err'), 400);
@@ -3039,7 +3203,7 @@ const forms = {
     save(); closeModal(); render(); toast(`+${qty} × ${s.name} = ${fmt(qty * price)}`);
   },
   cat(f) {
-    const data = {name: f.name.trim(), icon: (f.icon || '').trim() || '', kind: f.kind, budget: num(f.budget)};
+    const data = {name: f.name.trim(), icon: (f.icon || '📦').trim() || '📦', kind: f.kind, budget: num(f.budget)};
     if (f.id) upsert(D.categories, f.id, data); else D.categories.push({id: uid(), ...data});
     save(); closeModal(); render(); toast('Catégorie enregistrée.');
   },
@@ -3060,12 +3224,12 @@ const forms = {
     if (f.dir === 'in' && amount > totals().balance) return toast('Solde disponible insuffisant.', 'err');
     if (f.dir === 'out' && amount > emergencyBalance()) return toast('La caisse ne contient pas autant.', 'err');
     D.emergency.push({id: uid(), ts: Date.now(), date: today(), amount: f.dir === 'in' ? amount : -amount, note: (f.note || '').trim()});
-    save(); closeModal(); render(); toast(f.dir === 'in' ? `${fmt(amount)} mis à l'abri.` : `${fmt(amount)} retirés de la caisse.`);
+    save(); closeModal(); render(); toast(f.dir === 'in' ? `🛡️ ${fmt(amount)} mis à l'abri.` : `${fmt(amount)} retirés de la caisse.`);
   },
   goal(f) {
     const target = num(f.target);
     if (target <= 0) return toast('Montant cible invalide.', 'err');
-    const data = {name: f.name.trim(), icon: (f.icon || '').trim() || '', target, deadline: f.deadline || ''};
+    const data = {name: f.name.trim(), icon: (f.icon || '🎯').trim() || '🎯', target, deadline: f.deadline || ''};
     if (f.id) upsert(D.goals, f.id, data, {history: []}); else D.goals.push({id: uid(), history: [], ...data});
     save(); closeModal(); render(); toast('Objectif enregistré.');
   },
@@ -3076,7 +3240,7 @@ const forms = {
     if (f.dir === 'out' && amount > goalSaved(g)) return toast('Montant supérieur à l’épargne de cet objectif.', 'err');
     g.history.push({id: uid(), date: today(), amount: f.dir === 'in' ? amount : -amount, note: (f.note || '').trim()});
     save(); closeModal(); render();
-    toast(goalSaved(g) >= g.target ? `Objectif « ${g.name} » atteint !` : `${f.dir === 'in' ? '+' : '−'}${fmt(amount)} · ${g.name}`);
+    toast(goalSaved(g) >= g.target ? `🎉 Objectif « ${g.name} » atteint !` : `${f.dir === 'in' ? '+' : '−'}${fmt(amount)} · ${g.name}`);
   },
   settings(f) {
     D.settings.initialBalance = num(f.initialBalance); D.settings.theme = f.theme;
@@ -3110,7 +3274,7 @@ const actions = {
     startScan($('#scanV'), $('#scanS'), async t => {
       if (busy) return; busy = true; const c = sigOf(t), ok = await checkSig(c); busy = false;
       if (ok) { const lic = getLic(); lic.sig = c; try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) {} LIC_SIG_OK = true; closeModal(); unlockApp(); }
-      else { const st = $('#scanS'); if (st) st.textContent = 'Ce code ne correspond pas à cet appareil'; }
+      else { const st = $('#scanS'); if (st) st.textContent = '❌ Ce code ne correspond pas à cet appareil'; }
     });
   },
   install: () => {
@@ -3270,10 +3434,10 @@ function modeChooser(inSettings = false) {
       <ul class="mode-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>
       <p class="hint mt-s">${who}</p>
     </button>`;
-  const simple = card('simple', 'Mode simple', '', "L'essentiel pour savoir où va votre argent, sans rien de compliqué.",
+  const simple = card('simple', 'Mode simple', '🌱', "L'essentiel pour savoir où va votre argent, sans rien de compliqué.",
     ['Tableau de bord : votre solde et vos dépenses du mois', 'Journal de toutes vos dépenses', 'Entrées : revenus, bourse, petits projets', 'Sorties : budgets par catégorie (loyer, Woyofal, nourriture…)', "Objectifs d'épargne"],
     'Idéal pour débuter ou si vous voulez aller vite.');
-  const full = card('complet', 'Mode complet', '', 'Tout le mode simple, plus des outils pour anticiper et décider.',
+  const full = card('complet', 'Mode complet', '🚀', 'Tout le mode simple, plus des outils pour anticiper et décider.',
     ['Mode survie : combien de jours vous pouvez tenir avec votre solde', 'Projections et plafonds de dépenses par jour, semaine et mois', 'Simulateur : tester un achat avant de le faire', 'Caisse de secours pour les imprévus', 'Bilan détaillé du mois avec conseils'],
     'Pour ceux qui veulent piloter leur budget en détail.');
   return inSettings ? `<div class="mode-grid">${simple}${full}</div>` : `
@@ -3315,7 +3479,7 @@ function buildNav() {
   $('#brand-logo').innerHTML = BRANDMARK;
   $('#modal-close').innerHTML = icon('x', 18);
   $('#side-install').innerHTML = installBtn('btn btn-sm btn-block');
-  const sw = $('#side-wallet'); if (sw) sw.innerHTML = `<button class="wpill" style="width:100%;justify-content:flex-start" data-action="wallets"><span class="nm">${esc(curWallet().name)}</span><span style="margin-left:auto">▾</span></button>`;
+  const sw = $('#side-wallet'); if (sw) sw.innerHTML = `<button class="wpill" style="width:100%;justify-content:flex-start" data-action="wallets"><span>${curWallet().icon}</span><span class="nm">${esc(curWallet().name)}</span><span style="margin-left:auto">▾</span></button>`;
   $('#sidebar-nav').innerHTML = navViews().map(v => `<button class="nav-btn" data-action="go" data-id="${v.id}" data-nav="${v.id}">${icon(v.icon)}<span>${v.label}</span></button>`).join('');
   const bn = (id, ic, l) => `<button class="bn-btn" data-action="go" data-id="${id}" data-nav="${id}">${icon(ic, 22)}<span>${l}</span></button>`;
   $('#bottomnav').innerHTML = bn('dash', 'home', 'Accueil') + bn('journal', 'journal', 'Journal') +
