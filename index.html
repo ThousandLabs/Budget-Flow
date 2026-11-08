@@ -690,6 +690,24 @@ var TLL=(function(){
 
 /* Dictionnaire français → anglais */
 var TLL_EN={
+"Copies automatiques": "Automatic copies",
+"Restaurer une copie automatique": "Restore an automatic copy",
+"Copie du jour": "Daily copy",
+"Avant restauration": "Before restore",
+"Avant import": "Before import",
+"Avant effacement": "Before erase",
+"Restaurer": "Restore",
+"Aucune copie automatique pour l'instant.": "No automatic copy yet.",
+"Ces copies restent sur ce téléphone : en cas de perte du téléphone ou d'effacement complet des données du site, seul le fichier exporté vous protège.": "These copies stay on this phone: if the phone is lost or the site data is fully erased, only the exported file protects you.",
+"Remplacer les données actuelles par cette copie ? Les données actuelles sont gardées dans une copie « Avant restauration ».": "Replace the current data with this copy? The current data is kept in a “Before restore” copy.",
+"Copie introuvable.": "Copy not found.",
+"Copie restaurée ✓": "Copy restored ✓",
+"Données récupérées automatiquement depuis la copie de secours ✓": "Data recovered automatically from the backup copy ✓",
+"Mémoire du navigateur pleine (elle est partagée avec les autres applis Thousand Labs) : cette modification n'est pas enregistrée. Exportez une sauvegarde, puis libérez de la place.": "Browser storage is full (it is shared with the other Thousand Labs apps): this change was not saved. Export a backup, then free up some space.",
+"Sauvegarde impossible : le stockage du navigateur est bloqué (navigation privée ?).": "Cannot save: browser storage is blocked (private browsing?).",
+"Caméra non disponible ici. Ouvrez l'appli installée (site en https).": "Camera not available here. Open the installed app (https site).",
+"📵 Caméra non disponible ici. Ouvrez l'appli installée (site en https).": "📵 Camera not available here. Open the installed app (https site).",
+"❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilisez le message ou le fichier.": "❌ QR scanner unavailable offline on this phone. Use the message or the file.",
 "Maîtrisez votre argent,": "Master your money,",
 "jour après jour.": "day after day.",
 "Budget, dépenses, épargne et petits projets. 100 % privé, même sans Internet.": "Budget, spending, savings and small projects. 100% private, even offline.",
@@ -705,7 +723,7 @@ var TLL_EN={
 "Sans inscription": "No sign-up",
 "100 % privé, tout reste sur votre téléphone": "100% private, everything stays on your phone",
 "Essayer gratuitement 48 h": "Try free for 48 h",
-"Puis 10 000 F, une seule fois": "Then 10,000 F, one time",
+"Puis 5 000 F, une seule fois": "Then 5,000 F, one time",
 "J’ai déjà un code": "I already have a code",
 "par Thousand Labs": "by Thousand Labs",
 "Gardez Budget Flow": "Keep Budget Flow",
@@ -916,10 +934,10 @@ var TLL_EN={
 "Chargement du lecteur…": "Loading the scanner…",
 "🎯 Vise le QR code…": "🎯 Aim at the QR code…",
 "Vise le QR code…": "Aim at the QR code…",
-"📵 Caméra non disponible ici. Ouvre l'appli installée (site en https).": "📵 Camera not available here. Open the installed app (https site).",
+"📵 Caméra non disponible ici. Ouvrez l'appli installée (site en https).": "📵 Camera not available here. Open the installed app (https site).",
 "📵 Caméra non disponible ici. Ouvre l’appli installée (site en https).": "📵 Camera not available here. Open the installed app (https site).",
 "📵 Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.": "📵 Camera access denied. Allow it in your browser settings.",
-"❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilise le message ou le fichier.": "❌ QR scanner unavailable offline on this phone. Use the message or the file.",
+"❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilisez le message ou le fichier.": "❌ QR scanner unavailable offline on this phone. Use the message or the file.",
 "Contacter le support": "Contact support",
 "Thousand Labs": "Thousand Labs",
 "Une appli de": "An app by",
@@ -1812,7 +1830,7 @@ function loadW() {
   return w;
 }
 let W = loadW();
-const saveW = () => { try { localStorage.setItem(WKEY, JSON.stringify(W)); } catch (e) {} };
+const saveW = () => { try { localStorage.setItem(WKEY, JSON.stringify(W)); } catch (e) {} if (typeof SNAP !== 'undefined') SNAP.soon(); };
 const wKey = id => id === 'main' ? KEY : KEY + '__' + id;
 const dataKey = () => wKey(W.active);
 const curWallet = () => W.list.find(x => x.id === W.active) || W.list[0];
@@ -1834,8 +1852,70 @@ function load() {
 let D = load();
 function save() {
   try { localStorage.setItem(dataKey(), JSON.stringify(D)); }
-  catch (e) { toast('Sauvegarde impossible : stockage du navigateur plein ou bloqué.', 'err'); }
+  catch (e) { toast(tlQuota(e) ? FULL_MSG : 'Sauvegarde impossible : le stockage du navigateur est bloqué (navigation privée ?).', 'err'); }
+  SNAP.soon();
 }
+const FULL_MSG = 'Mémoire du navigateur pleine (elle est partagée avec les autres applis Thousand Labs) : cette modification n\'est pas enregistrée. Exportez une sauvegarde, puis libérez de la place.';
+/* =====================================================================
+   Copies de secours automatiques (même principe que Power Log)
+   • À chaque modification, une copie est gardée sur ce téléphone, dans la base
+     interne du navigateur (IndexedDB), sans Internet ni serveur : une par jour,
+     sur les 14 derniers jours, plus les 5 dernières copies « avant » une
+     restauration, un import ou un effacement.
+   • Au démarrage, si les données principales ont disparu ou sont illisibles,
+     l'appli les récupère seule depuis la dernière copie.
+   • La base interne a beaucoup plus de place que le stockage principal : les
+     copies continuent même quand celui-ci est plein.
+   ===================================================================== */
+function TLSNAP(cfg){
+  var ST='snaps',DAYS=cfg.days||14,PRE=cfg.pre||5,timer=0,last='',ready=false,pending=false;
+  function open(){return new Promise(function(res,rej){try{var r=indexedDB.open(cfg.db,1);r.onupgradeneeded=function(){try{r.result.createObjectStore(ST)}catch(e){}};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)}}catch(e){rej(e)}})}
+  function tx(mode,fn){return open().then(function(db){return new Promise(function(res,rej){var out,x=db.transaction(ST,mode),st=x.objectStore(ST);try{out=fn(st)}catch(e){db.close();return rej(e)}
+    x.oncomplete=function(){db.close();res(out&&('result' in out)?out.result:out)};x.onerror=x.onabort=function(){db.close();rej(x.error)}})})}
+  function get(k){return tx('readonly',function(st){return st.get(k)}).catch(function(){return null})}
+  function keys(){return tx('readonly',function(st){return st.getAllKeys()}).catch(function(){return []})}
+  function grab(){var m={};cfg.keys().forEach(function(k){try{var v=localStorage.getItem(k);if(v!=null)m[k]=v}catch(e){}});return m}
+  function cnt(m){try{return +cfg.count(m)||0}catch(e){return 0}}
+  function day(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+  function starts(p){return function(k){return String(k).indexOf(p)===0}}
+  function write(){clearTimeout(timer);timer=0;pending=false;var m=grab(),json=JSON.stringify(m);if(json===last)return Promise.resolve();last=json;
+    var n=cnt(m),rec={t:Date.now(),data:m,n:n},dk='day:'+day();
+    return keys().then(function(old){old=old.filter(starts('day:')).sort();var all=old.slice();if(n>0&&all.indexOf(dk)<0)all.push(dk);all.sort();var keep=all.slice(-DAYS);
+      return tx('readwrite',function(st){st.put(rec,'latest');if(n>0)st.put(rec,dk);old.forEach(function(k){if(keep.indexOf(k)<0)st.delete(k)})})}).catch(function(){})}
+  var api={
+    /* à appeler après chaque enregistrement */
+    soon:function(){pending=true;if(!ready)return;clearTimeout(timer);timer=setTimeout(write,1500)},
+    flush:function(){if(ready&&pending)write()},
+    /* copie « avant » une opération qui remplace ou efface les données (appel synchrone : la copie est prise tout de suite) */
+    keep:function(kind){var m=grab(),n=cnt(m);if(!n)return Promise.resolve();
+      return keys().then(function(old){old=old.filter(starts('pre:')).sort();return tx('readwrite',function(st){st.put({t:Date.now(),data:m,n:n,kind:kind},'pre:'+Date.now());old.slice(0,Math.max(0,old.length-PRE+1)).forEach(function(k){st.delete(k)})})}).catch(function(){})},
+    list:function(){return keys().then(function(ks){return Promise.all(ks.filter(function(k){return k!=='latest'}).map(function(k){return get(k).then(function(r){return r&&r.data?{key:String(k),t:r.t,n:r.n||0,kind:starts('pre:')(k)?(r.kind||'restore'):'day'}:null})}))})
+      .then(function(L){return L.filter(Boolean).sort(function(a,b){return b.t-a.t})})},
+    /* remplace les données actuelles par une copie (les actuelles sont gardées dans « Avant restauration ») */
+    restore:function(k){return get(k).then(function(r){if(!r||!r.data)return 'none';api.keep('restore');
+      try{cfg.keys().forEach(function(x){if(!(x in r.data))localStorage.removeItem(x)});Object.keys(r.data).forEach(function(x){localStorage.setItem(x,r.data[x])})}catch(e){return 'full'}
+      last=JSON.stringify(grab());return 'ok'})},
+    /* au démarrage : données principales absentes ou illisibles → reprise de la dernière copie. Renvoie true si des données ont été récupérées. */
+    heal:function(){var raw=null;try{raw=localStorage.getItem(cfg.main())}catch(e){ready=true;return Promise.resolve(false)}
+      if(raw){try{JSON.parse(raw);last=JSON.stringify(grab());ready=true;if(pending)api.soon();return Promise.resolve(false)}catch(e){}}
+      return get('latest').then(function(r){if(r&&r.data&&r.n>0)return r;return api.list().then(function(L){return L[0]?get(L[0].key):null})})
+        .then(function(r){var ok=false;if(r&&r.data&&r.n>0){ok=true;Object.keys(r.data).forEach(function(x){try{localStorage.setItem(x,r.data[x])}catch(e){ok=false}})}
+          last=JSON.stringify(grab());ready=true;if(pending)api.soon();return ok})}
+  };
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')api.flush()});
+  window.addEventListener('pagehide',function(){api.flush()});
+  return api;
+}
+/* Le stockage principal est-il plein ? (sinon : bloqué, par exemple en navigation privée) */
+function tlQuota(e){return !!e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED'||e.code===22||e.code===1014)}
+
+const SNAP_DAYS = 14;
+const SNAP = TLSNAP({
+  db: 'budgetflow-secours', days: SNAP_DAYS,
+  keys: () => { const ks = [WKEY]; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k === KEY || k.indexOf(KEY + '__') === 0) ks.push(k); } } catch (e) {} return ks; },
+  main: () => dataKey(),
+  count: m => Object.keys(m).filter(k => k !== WKEY).reduce((n, k) => { try { const d = JSON.parse(m[k]); return n + (d.expenses || []).length + (d.incomes || []).length + (d.sales || []).length; } catch (e) { return n; } }, 0)
+});
 
 /* =========================================================================
    2 bis. LICENCE : CODE D'ACCÈS LIÉ À L'APPAREIL
@@ -1847,7 +1927,7 @@ function save() {
    ========================================================================= */
 const TEAM = 'Thousand Labs';
 const CONTACT = '221711216581', CONTACT_FMT = '71\u00a0121\u00a065\u00a081';
-const PRICE = '10\u00a0000\u00a0F';
+const PRICE = '5\u00a0000\u00a0F';
 const LIC_KEY = 'budgetflow_licence';
 const ALPHA = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const cleanCode = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -2000,12 +2080,12 @@ let scanStream=null,scanTimer=null;
 function loadJsQR(){return new Promise((ok,ko)=>{if(window.jsQR)return ok();const s=document.createElement('script');s.src='./jsQR.js';/* jsQR 1.4.0 (github.com/cozmo/jsQR), hébergé avec l'appli : aucun script externe */s.onload=()=>window.jsQR?ok():ko();s.onerror=ko;document.head.appendChild(s)})}
 async function startScan(video,status,onText){
   stopScan();
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){status.textContent='📵 Caméra non disponible ici. Ouvre l\'appli installée (site en https).';return}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){status.textContent='📵 Caméra non disponible ici. Ouvrez l\'appli installée (site en https).';return}
   try{scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false})}catch(e){status.textContent='📵 Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.';return}
   video.setAttribute('playsinline','');video.muted=true;video.srcObject=scanStream;try{await video.play()}catch(e){}
   let detect=null;
   if('BarcodeDetector' in window){try{const bd=new BarcodeDetector({formats:['qr_code']});detect=async()=>{const r=await bd.detect(video);return r.length?r[0].rawValue:null}}catch(e){detect=null}}
-  if(!detect){status.textContent='Chargement du lecteur…';try{await loadJsQR()}catch(e){status.textContent='❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilise le message ou le fichier.';stopScan();return}
+  if(!detect){status.textContent='Chargement du lecteur…';try{await loadJsQR()}catch(e){status.textContent='❌ Lecteur QR indisponible hors ligne sur ce téléphone. Utilisez le message ou le fichier.';stopScan();return}
     const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
     detect=async()=>{const w=video.videoWidth,h=video.videoHeight;if(!w)return null;const s=Math.min(1,720/Math.max(w,h));cv.width=w*s|0;cv.height=h*s|0;cx.drawImage(video,0,0,cv.width,cv.height);const r=window.jsQR(cx.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height,{inversionAttempts:'dontInvert'});return r?r.data:null}}
   if(!scanStream)return;
@@ -2127,7 +2207,7 @@ function tlwHTML(c){return '<div class="tlw" style="--tlw:'+c.accent+'"><div cla
 function renderLock(err = '') {
   const lic = getLic(), ti = trialInfo();
   document.body.classList.add('locked');
-  if (!ti.started && !isActivated() && !TLW_FULL) { $('#lock').innerHTML = tlwHTML({accent:'#0f766e',icon:'icon-192.png?v=tl3',name:'Budget Flow',by:'par Thousand Labs',l1:'Maîtrisez votre argent,',l2:'jour après jour.',sub:'Budget, dépenses, épargne et petits projets. 100 % privé, même sans Internet.',prev:'<div class="tlw-ph"><span>Octobre</span><span>Exemple</span></div><div class="tlw-big">Solde : 84 500 F</div><div class="tlw-row"><span><b>Loyer</b><div class="tlw-bar"><i style="width:100%"></i></div></span><b>35 000 F</b></div><div class="tlw-row"><span><b>Woyofal</b><div class="tlw-bar"><i style="width:80%"></i></div></span><b>8 000 F</b></div><div class="tlw-row"><span><b>Nourriture</b><div class="tlw-bar"><i style="width:72%"></i></div></span><b>21 500 F</b></div>',feats:[['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>','Journal des dépenses','Chaque franc noté, avec des enveloppes par poste'],['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>','Mode survie','Combien de jours pouvez-vous tenir ?'],['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>','Sans inscription','100 % privé, tout reste sur votre téléphone']],cta:'Essayer gratuitement 48 h',start:'trial-start',price:'Puis 10 000 F, une seule fois',have:'J’ai déjà un code',full:'lock-full',sw:TLL.switcher()}); return; }
+  if (!ti.started && !isActivated() && !TLW_FULL) { $('#lock').innerHTML = tlwHTML({accent:'#0f766e',icon:'icon-192.png?v=tl3',name:'Budget Flow',by:'par Thousand Labs',l1:'Maîtrisez votre argent,',l2:'jour après jour.',sub:'Budget, dépenses, épargne et petits projets. 100 % privé, même sans Internet.',prev:'<div class="tlw-ph"><span>Octobre</span><span>Exemple</span></div><div class="tlw-big">Solde : 84 500 F</div><div class="tlw-row"><span><b>Loyer</b><div class="tlw-bar"><i style="width:100%"></i></div></span><b>35 000 F</b></div><div class="tlw-row"><span><b>Woyofal</b><div class="tlw-bar"><i style="width:80%"></i></div></span><b>8 000 F</b></div><div class="tlw-row"><span><b>Nourriture</b><div class="tlw-bar"><i style="width:72%"></i></div></span><b>21 500 F</b></div>',feats:[['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>','Journal des dépenses','Chaque franc noté, avec des enveloppes par poste'],['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>','Mode survie','Combien de jours pouvez-vous tenir ?'],['<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>','Sans inscription','100 % privé, tout reste sur votre téléphone']],cta:'Essayer gratuitement 48 h',start:'trial-start',price:'Puis 5 000 F, une seule fois',have:'J’ai déjà un code',full:'lock-full',sw:TLL.switcher()}); return; }
   const trialHtml = ti.active
     ? `<div class="alert alert-amber"><span class="a-ic">🎁</span><span>Essai gratuit en cours : il reste ${fmtLeft(ti.left)}</span></div><button type="button" class="btn btn-block" data-action="trial-back">← Continuer l'essai gratuit</button>`
     : ti.started
@@ -2138,7 +2218,7 @@ function renderLock(err = '') {
     <div><div class="brand" style="padding:0 0 4px"><div class="brand-logo">${BRANDMARK}</div>Budget Flow</div><p class="hint">par ${TEAM}</p></div>
     <div>${ti.started && !ti.active ? `<h1 class="lock-title">Gardez Budget Flow</h1><p class="sub mt-s">Votre essai de 48 h est terminé. Vos données sont conservées : activez l'appli pour les retrouver.</p>` : `<h1 class="lock-title">Activer Budget Flow</h1><p class="sub mt-s">Une seule fois, sans abonnement. Le code est lié à ce téléphone.</p>`}${TLL.switcher()}</div>
     ${trialHtml}
-    ${(TLBUY.init({app:"Budget Flow",vous:true,unitWord:"appareil",unit:10000,dev:function(){return lic.dev},lang:function(){return TLL.lang()}}),TLBUY.html())}
+    ${(TLBUY.init({app:"Budget Flow",vous:true,unitWord:"appareil",unit:5000,dev:function(){return lic.dev},lang:function(){return TLL.lang()}}),TLBUY.html())}
     <form data-form="activate" class="stack" autocomplete="off">
       ${field("Code d'activation", `<textarea class="input code-area" name="code" rows="3" placeholder="Collez ici le code reçu (tout le texte)" autocomplete="off" spellcheck="false" required></textarea>`)}
       ${err ? `<div class="alert alert-red">${err}</div>` : ''}
@@ -2977,6 +3057,7 @@ const GUIDE = [
   ['💾 Sauvegarde & changement de téléphone', `<ul>
     <li>Vos données restent <b>uniquement sur cet appareil</b> : aucune inscription, aucun serveur.</li>
     <li>Dans Réglages, touchez <b>Exporter</b> régulièrement : vous obtenez un fichier de sauvegarde à garder (WhatsApp à vous-même, Drive…).</li>
+    <li><b>Copies automatiques</b> : en plus, l'appli garde seule une copie par jour sur ce téléphone (14 derniers jours) et une copie avant chaque import ou effacement. Réglages › « Restaurer une copie automatique ». Si les données disparaissent, elles sont récupérées automatiquement au démarrage.</li>
     <li>Nouveau téléphone : ouvrez Budget Flow, demandez un nouveau code d'activation, puis <b>Importer</b> votre sauvegarde.</li>
     <li>Ouvrez toujours l'appli depuis son icône : sur iPhone, Safari et l'appli installée ne partagent pas les mêmes données.</li></ul>`],
   ['❓ Questions fréquentes', `<ul>
@@ -3030,6 +3111,11 @@ views.reglages = () => {
         <label class="btn" style="cursor:pointer">Importer<input type="file" accept=".json,application/json" data-live="import" hidden></label>
       </div>
       <p class="hint mt">Dernière sauvegarde : ${s.lastBackup ? dateLong(s.lastBackup) : 'jamais'}</p>
+    </div>
+    <div class="card">
+      <h2>Copies automatiques</h2>
+      <p class="sub mt-s">À chaque modification, une copie est gardée sur ce téléphone, sans Internet (une par jour, ${SNAP_DAYS} derniers jours, tous portefeuilles compris). Si les données principales disparaissent, l'appli les récupère seule.</p>
+      <button class="btn btn-sm mt-s" data-action="snaps">🕘 Restaurer une copie automatique</button>
     </div>
     <div class="card">
       <h2>À propos des données</h2>
@@ -3390,10 +3476,25 @@ const actions = {
     D.settings.lastBackup = today(); save(); render();
     toast(r === 'shared' ? 'Sauvegarde envoyée ✓' : 'Sauvegarde téléchargée. Gardez le fichier en lieu sûr (WhatsApp, Drive…).');
   },
+  snaps: async () => {
+    openModal('Copies automatiques', '<p class="sub">Chargement…</p>');
+    const L = await SNAP.list(), body = $('#modal-body'); if (!body) return;
+    const kinds = {day: 'Copie du jour', restore: 'Avant restauration', import: 'Avant import', wipe: 'Avant effacement'};
+    body.innerHTML = (L.length ? `<div class="list">${L.map(x => `<div class="kv" style="align-items:center;gap:10px"><span><b>${esc(new Date(x.t).toLocaleString(TLL.lang() === 'en' ? 'en-GB' : 'fr-FR', {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}))}</b><br><span class="hint">${kinds[x.kind] || kinds.day} · ${x.n} opération${x.n > 1 ? 's' : ''}</span></span><button class="btn btn-sm btn-primary" data-action="snap-restore" data-id="${esc(x.key)}">Restaurer</button></div>`).join('')}</div>`
+      : '<p class="sub">Aucune copie automatique pour l\'instant.</p>')
+      + '<p class="hint mt">Ces copies restent sur ce téléphone : en cas de perte du téléphone ou d\'effacement complet des données du site, seul le fichier exporté vous protège.</p>';
+  },
+  'snap-restore': async id => {
+    if (!confirm('Remplacer les données actuelles par cette copie ? Les données actuelles sont gardées dans une copie « Avant restauration ».')) return;
+    const r = await SNAP.restore(id);
+    if (r === 'none') return toast('Copie introuvable.', 'err');
+    if (r === 'full') return toast(FULL_MSG, 'err');
+    W = loadW(); D = load(); applyTheme(); buildNav(); closeModal(); go('dash'); toast('Copie restaurée ✓');
+  },
   reset: () => {
     if (!confirm(multiW() ? 'Effacer toutes les données du portefeuille « ' + curWallet().name + ' » ? Les autres portefeuilles ne sont pas touchés. Cette action est irréversible.' : 'Effacer TOUTES les données de Budget Flow ? Cette action est irréversible.')) return;
     if (prompt('Tapez EFFACER pour confirmer.') !== 'EFFACER') return toast('Réinitialisation annulée.');
-    localStorage.removeItem(dataKey()); D = defaultData(); if (curWallet().kind === 'pro') D.categories = PRO_CATS.map(c => ({...c})); save(); applyTheme(); go('dash'); toast('Données effacées.');
+    SNAP.keep('wipe'); localStorage.removeItem(dataKey()); D = defaultData(); if (curWallet().kind === 'pro') D.categories = PRO_CATS.map(c => ({...c})); save(); applyTheme(); go('dash'); toast('Données effacées.');
   }
 };
 
@@ -3418,6 +3519,7 @@ const live = {
         if (!isActivated() && d._dev !== getLic().dev) return alert(TLL.tr("Pendant l'essai gratuit, seules les sauvegardes faites sur ce téléphone peuvent être restaurées. Activez Budget Flow pour récupérer une sauvegarde d'un autre appareil."));
         delete d._dev;
         if (!confirm('Remplacer les données actuelles par celles de la sauvegarde ?')) return;
+        SNAP.keep('import');
         try { localStorage.setItem(dataKey(), JSON.stringify(d)); }
         catch (e) { return toast('Restauration impossible : la mémoire du téléphone est pleine. Libérez de la place puis réessayez.', 'err'); }
         D = load(); save(); applyTheme(); render(); toast('Sauvegarde restaurée.');
@@ -3529,12 +3631,16 @@ window.addEventListener('storage', e => { if (e.key === WKEY) { W = loadW(); D =
 (async function init() {
   const v = location.hash.slice(1);
   state.view = views[v] ? v : 'dash';
+  const healed = await SNAP.heal();
+  if (healed) { W = loadW(); D = load(); }
   const l = getLic();
   if (l.sig) LIC_SIG_OK = await checkSig(l.sig);
   if (!LIC_SIG_OK) tlHeal(true);
   buildNav(); applyTheme(); render();
   if (!isActivated() && trialInfo().active) { trialTouch(); trialTimer = setInterval(trialTick, 30000); }
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  if (healed) toast('Données récupérées automatiquement depuis la copie de secours ✓');
+  SNAP.soon();
 })();
 </script>
 </body>
