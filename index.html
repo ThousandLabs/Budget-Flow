@@ -487,6 +487,25 @@ var ICO=(function(){
   return {svg:function(n,c){return svg([n,c])},strip:strip};
 })();
 </script>
+<script>
+/* =====================================================================
+   Transfert de licence (Thousand Labs)
+   Quand le client change de téléphone, il touche « Transférer ma licence » :
+   l'appli se verrouille sur CE téléphone et affiche un code de transfert.
+   Le client envoie ce code (avec la preuve de licence) au vendeur, qui le
+   vérifie dans Thousand Admin avant de donner un code pour le nouveau téléphone.
+   Le même code d'activation est ensuite refusé sur cet ancien téléphone.
+   ===================================================================== */
+var TLX=(function(){var A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  function code(app,id,sig){return crypto.subtle.digest('SHA-256',new TextEncoder().encode('TL-XFER/v1|'+app+'|'+id+'|'+sig)).then(function(b){var d=new Uint8Array(b),s='';for(var i=0;i<10;i++)s+=A.charAt(d[i]%A.length);return s.slice(0,5)+'-'+s.slice(5)})}
+  function get(app){try{var r=JSON.parse(localStorage.getItem('tl_xfer_'+app));return r&&r.code&&r.sig?r:null}catch(e){return null}}
+  function set(app,r){try{localStorage.setItem('tl_xfer_'+app,JSON.stringify(r));return true}catch(e){return false}}
+  function clear(app){try{localStorage.removeItem('tl_xfer_'+app)}catch(e){}}
+  function msg(name,r,shownId){return 'Bonjour, je souhaite transférer ma licence '+name+' vers un nouveau téléphone.\n\nAncien identifiant : '+shownId+'\nCode de transfert : '+r.code+'\nPreuve de licence : '+r.sig+'\n\nNouvel identifiant : '+(r.nid||'')}
+  function send(wa,name,r,shownId){window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg(name,r,shownId)),'_blank','noopener')}
+  function date(r){try{return new Date(r.at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}catch(e){return ''}}
+  return {code:code,get:get,set:set,clear:clear,msg:msg,send:send,date:date}})();
+</script>
 </head>
 <body>
 <div id="lock"></div>
@@ -1453,7 +1472,7 @@ var TLL_EN={
 "Dans Réglages, touchez": "In Settings, tap",
 "Exporter": "Export",
 "régulièrement : vous obtenez un fichier de sauvegarde à garder (WhatsApp à vous-même, Drive…).": "regularly: you get a backup file to keep (WhatsApp to yourself, Drive…).",
-"Nouveau téléphone : ouvrez Budget Flow, demandez un nouveau code d'activation, puis": "New phone: open Budget Flow, request a new activation code, then",
+"Nouveau téléphone : sur l'ancien, faites une sauvegarde puis Réglages › Licence ›": "New phone: on the old one, make a backup, then Settings › Licence ›", "Transférer ma licence": "Transfer my licence", "et envoyez le message de transfert à Thousand Labs. Activez le nouveau téléphone avec le code reçu, puis": "and send the transfer message to Thousand Labs. Activate the new phone with the code you receive, then",
 "Nouveau téléphone : ouvrez Budget Flow, demandez un nouveau code d’activation, puis": "New phone: open Budget Flow, request a new activation code, then",
 "Importer": "Import",
 "votre sauvegarde.": "your backup.",
@@ -1965,6 +1984,7 @@ function unb64u(t){t=String(t).replace(/-/g,'+').replace(/_/g,'/');while(t.lengt
 async function checkSig(sig) {
   try {
     const c = sigOf(sig); if (!c || !(window.crypto && crypto.subtle)) return false;
+    const xf = getLic().xfer; if (xf && xf.sig === c) return false; // code transféré vers un autre téléphone
       if (await legacyOk(getLic().dev, c)) return true;
     const k = await crypto.subtle.importKey('jwk', BF_PUB, {name: 'ECDSA', namedCurve: 'P-256'}, false, ['verify']);
     return await crypto.subtle.verify({name: 'ECDSA', hash: 'SHA-256'}, k, unb64u(c), new TextEncoder().encode(getLic().dev));
@@ -1982,6 +2002,7 @@ const TRIAL_MS = 48 * 3600 * 1000;
 let trialTimer = null;
 function trialInfo() {
   const lic = getLic(), start = +lic.trial || 0;
+  if (lic.xfer) return {started: true, active: false, left: 0};
   if (!start) return {started: false, active: false, left: 0};
   const now = Date.now(), seen = Math.max(+lic.seen || 0, start);
   const left = now < seen - 10 * 60 * 1000 ? 0 : Math.max(0, start + TRIAL_MS - now);
@@ -2213,11 +2234,12 @@ function renderLock(err = '') {
     : ti.started
       ? ''
       : `<div class="trial-box"><b>🎁 Essayez gratuitement pendant 48 h</b><span class="hint">Accès complet, sans paiement ni engagement. Ensuite, un code d'activation sera demandé ; vos données seront conservées.</span><button type="button" class="btn btn-primary btn-block" data-action="trial-start">Commencer l'essai gratuit</button></div>`;
+  const xfHtml = lic.xfer ? `<div class="trial-box"><b>🔁 Licence transférée le ${TLX.date(lic.xfer)}</b><span class="hint">Ce téléphone n'est plus activé. Envoyez ce message à ${TEAM} pour recevoir le code de votre nouveau téléphone, en ajoutant à la fin le code du nouveau téléphone (affiché sur son écran d'activation).</span><span class="label">Code de transfert</span><div class="dev-id">${lic.xfer.code}</div><button type="button" class="btn btn-primary btn-block" data-action="xfer-send">💬 Envoyer le message de transfert</button><button type="button" class="btn btn-block" data-action="xfer-copy">📋 Copier le message</button></div>` : '';
   const msg = `Bonjour, je souhaite obtenir Budget Flow (${PRICE}). Mon code appareil : ${lic.dev}`;
   $('#lock').innerHTML = `<div class="lock-wrap"><div class="lock-card ${err ? 'shake' : ''}">
     <div><div class="brand" style="padding:0 0 4px"><div class="brand-logo">${BRANDMARK}</div>Budget Flow</div><p class="hint">par ${TEAM}</p></div>
-    <div>${ti.started && !ti.active ? `<h1 class="lock-title">Gardez Budget Flow</h1><p class="sub mt-s">Votre essai de 48 h est terminé. Vos données sont conservées : activez l'appli pour les retrouver.</p>` : `<h1 class="lock-title">Activer Budget Flow</h1><p class="sub mt-s">Une seule fois, sans abonnement. Le code est lié à ce téléphone.</p>`}${TLL.switcher()}</div>
-    ${trialHtml}
+    <div>${lic.xfer ? `<h1 class="lock-title">Activer Budget Flow sur ce téléphone</h1><p class="sub mt-s">Votre licence a été transférée. Pour réutiliser Budget Flow ici, il faut un nouveau code pour ce téléphone.</p>` : ti.started && !ti.active ? `<h1 class="lock-title">Gardez Budget Flow</h1><p class="sub mt-s">Votre essai de 48 h est terminé. Vos données sont conservées : activez l'appli pour les retrouver.</p>` : `<h1 class="lock-title">Activer Budget Flow</h1><p class="sub mt-s">Une seule fois, sans abonnement. Le code est lié à ce téléphone.</p>`}${TLL.switcher()}</div>
+    ${xfHtml}${trialHtml}
     ${(TLBUY.init({app:"Budget Flow",vous:true,unitWord:"appareil",unit:5000,dev:function(){return lic.dev},lang:function(){return TLL.lang()}}),TLBUY.html())}
     <form data-form="activate" class="stack" autocomplete="off">
       ${field("Code d'activation", `<textarea class="input code-area" name="code" rows="3" placeholder="Collez ici le code reçu (tout le texte)" autocomplete="off" spellcheck="false" required></textarea>`)}
@@ -3058,7 +3080,7 @@ const GUIDE = [
     <li>Vos données restent <b>uniquement sur cet appareil</b> : aucune inscription, aucun serveur.</li>
     <li>Dans Réglages, touchez <b>Exporter</b> régulièrement : vous obtenez un fichier de sauvegarde à garder (WhatsApp à vous-même, Drive…).</li>
     <li><b>Copies automatiques</b> : en plus, l'appli garde seule une copie par jour sur ce téléphone (14 derniers jours) et une copie avant chaque import ou effacement. Réglages › « Restaurer une copie automatique ». Si les données disparaissent, elles sont récupérées automatiquement au démarrage.</li>
-    <li>Nouveau téléphone : ouvrez Budget Flow, demandez un nouveau code d'activation, puis <b>Importer</b> votre sauvegarde.</li>
+    <li>Nouveau téléphone : sur l'ancien, faites une sauvegarde puis Réglages › Licence › <b>Transférer ma licence</b> et envoyez le message de transfert à Thousand Labs. Activez le nouveau téléphone avec le code reçu, puis <b>Importer</b> votre sauvegarde.</li>
     <li>Ouvrez toujours l'appli depuis son icône : sur iPhone, Safari et l'appli installée ne partagent pas les mêmes données.</li></ul>`],
   ['❓ Questions fréquentes', `<ul>
     <li><b>Faut-il Internet ?</b> Seulement la toute première fois, pour installer l'appli. Ensuite, tout fonctionne hors ligne.</li>
@@ -3139,6 +3161,7 @@ views.reglages = () => {
         <div class="kv"><span>Statut</span>${isActivated() ? '<span class="badge b-green">✓ Activée</span>' : '<span class="badge b-amber">🎁 Essai gratuit</span>'}</div>
         ${isActivated() ? '' : `<div class="kv"><span>Temps restant</span><b>${fmtLeft(trialInfo().left)}</b></div><div class="mt-s"><button class="btn btn-sm btn-primary" data-action="trial-buy">🔑 Activer maintenant</button></div>`}
         <div class="kv"><span>Code appareil</span><b style="font-family:ui-monospace,monospace">${getLic().dev}</b></div>
+        ${isActivated() ? '<div class="mt-s"><button class="btn btn-sm" data-action="xfer-open">🔁 Transférer ma licence vers un autre téléphone</button></div>' : ''}
         <div class="kv"><span>Éditeur</span><b>${TEAM}</b></div>
         <div class="kv"><span>Assistance</span><a class="link-btn" href="${waLink('Bonjour, j’ai besoin d’aide avec Budget Flow.')}" target="_blank" rel="noopener">WhatsApp ${CONTACT_FMT}</a></div>
       </div>
@@ -3231,12 +3254,22 @@ const forms = {
     W.list.push({id, name, icon: kind === 'pro' ? '🏪' : '👤', kind}); saveW(); switchWallet(id);
   },
   'wallet-rename': v => { const name = String(v.name || '').trim().slice(0, 30); if (!name) return; curWallet().name = name; saveW(); buildNav(); closeModal(); render(); toast('Portefeuille renommé.'); },
+  async xfer(f) {
+    const lic = getLic();
+    if (!isActivated() || !lic.sig) return;
+    const nid = String(f.nid || '').trim().slice(0, 40);
+    const code = await TLX.code('budget', lic.dev, lic.sig);
+    lic.xfer = {code, sig: lic.sig, nid, at: Date.now()}; delete lic.sig;
+    try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) { return toast('Transfert impossible : le stockage du navigateur est bloqué.', 'err'); }
+    LIC_SIG_OK = false; clearInterval(trialTimer); closeModal(); renderLock(); window.scrollTo(0, 0);
+  },
   async activate(f) {
     const lic = getLic(), c = sigOf(f.code);
     if (!c) return renderLock("Collez votre code d'activation.");
+    if (lic.xfer && lic.xfer.sig === c) return renderLock("Ce code a été transféré vers un autre téléphone : il ne fonctionne plus ici. Demandez un code pour ce téléphone à Thousand Labs.");
     if (!(window.crypto && crypto.subtle)) return renderLock("Ouvrez l'application depuis son lien https pour l'activer.");
     if (await checkSig(c)) {
-      lic.sig = c; try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) {}
+      lic.sig = c; delete lic.xfer; try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) {}
       LIC_SIG_OK = true; unlockApp();
     } else renderLock("Code incorrect. Copiez-le en entier : il doit correspondre à ce code appareil.");
   },
@@ -3356,6 +3389,15 @@ const actions = {
   'lock-welcome': () => { TLW_FULL = false; renderLock(); scrollTo(0, 0); },
   'trial-start': () => { const lic = getLic(); if (lic.trial) return renderLock(); lic.trial = lic.seen = Date.now(); try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) {} tlHeal(true); enterTrial(true); },
   'trial-back': () => { if (trialInfo().active) enterTrial(false); else renderLock(); },
+  'xfer-open': () => openModal('Transférer ma licence', `<form data-form="xfer" class="stack" autocomplete="off">
+    <p class="sub">À utiliser si vous changez de téléphone. Après le transfert :</p>
+    <p class="sub">1. Budget Flow se verrouille sur <b>ce</b> téléphone et votre code actuel n'y fonctionnera plus.<br>2. Vous envoyez le message de transfert à ${TEAM} sur WhatsApp.<br>3. Vous recevez un code pour votre nouveau téléphone.</p>
+    <div class="alert alert-amber"><span class="a-ic">💾</span><span>Faites d'abord une sauvegarde de vos données (Réglages › Sauvegarde) et envoyez-la-vous : vous la restaurerez sur le nouveau téléphone.</span></div>
+    ${field('Code du nouveau téléphone (facultatif)', '<input class="input" name="nid" maxlength="40" placeholder="BF-XXXX-XXXX" autocomplete="off" spellcheck="false">')}
+    <button class="btn btn-danger btn-block">Confirmer le transfert</button>
+  </form>`),
+  'xfer-send': () => { const l = getLic(); if (l.xfer) TLX.send(CONTACT, 'Budget Flow', l.xfer, l.dev); },
+  'xfer-copy': () => { const l = getLic(); if (l.xfer) copyText(TLX.msg('Budget Flow', l.xfer, l.dev)); },
   'trial-buy': () => { closeModal(); renderLock(); window.scrollTo(0, 0); },
   'lock-copy': () => copyText(getLic().dev),
   'lock-qr': () => { const d = getLic().dev; openModal('Votre code appareil', `<p class="sub" style="text-align:center">Le vendeur scanne ce QR code avec Thousand Admin.</p><div id="qrBox"></div><div class="dev-id" style="text-align:center">${d}</div>`); $('#qrBox').appendChild(QR.canvas('BFID:' + d, 600, 'M')); },
@@ -3364,7 +3406,7 @@ const actions = {
     let busy = false;
     startScan($('#scanV'), $('#scanS'), async t => {
       if (busy) return; busy = true; const c = sigOf(t), ok = await checkSig(c); busy = false;
-      if (ok) { const lic = getLic(); lic.sig = c; try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) {} LIC_SIG_OK = true; closeModal(); unlockApp(); }
+      if (ok) { const lic = getLic(); lic.sig = c; delete lic.xfer; try { localStorage.setItem(LIC_KEY, JSON.stringify(lic)); } catch (e) {} LIC_SIG_OK = true; closeModal(); unlockApp(); }
       else { const st = $('#scanS'); if (st) st.textContent = '❌ Ce code ne correspond pas à cet appareil'; }
     });
   },
